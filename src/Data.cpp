@@ -1,11 +1,11 @@
-#include "../include/Data.hpp"
+#include <Data.hpp>
 
 namespace MyRandom
 {
     std::mt19937 rng(std::chrono::steady_clock().now().time_since_epoch().count());
 }
 
-namespace Data
+namespace BoardData
 {   
 
 //  declare constant
