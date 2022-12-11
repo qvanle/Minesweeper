@@ -1,16 +1,19 @@
-INIT: # remove this one and add some command to Building and GetLog
-	mkdir lib
-	mkdir log
-Building:
+INCLUDE_PATH :=/home/qvanle/College/CS161/Minesweeper/include
+
+INIT:
+	find lib || mkdir lib
+	find log || mkdir log
+Building: INIT
 	clear
-	g++ -c src/Data.cpp -I/home/qvanle/College/CS161/Minesweeper/include -o lib/Data.o
-	g++ -c src/main.cpp -I/home/qvanle/College/CS161/Minesweeper/include -o lib/main.o
+	g++ -c src/Data.cpp -I $(INCLUDE_PATH) -o lib/Data.o
+	g++ -c src/Visual.cpp -I $(INCLUDE_PATH) -olib/Visual.o
+	g++ -c src/main.cpp -I $(INCLUDE_PATH) -o lib/main.o
 
 Linking:
-	g++ -o MyGame.exe lib/*.o
+	g++ -o MyGame.out lib/*.o -lsfml-system -lsfml-window -lsfml-graphics
 
 Compiling: Building Linking
 
 GetLog: Compiling
-	./MyGame.exe > log/BoardData.log
+	./MyGame.out > log/BoardData.log
 
