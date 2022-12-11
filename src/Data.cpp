@@ -23,6 +23,9 @@ namespace BoardData
     int Columns, Rows;
     int Mines;
 
+    std::vector<std::vector<int> > Components;
+    std::vector<int> ComponentID;
+
 
 //  change 2d cell point into 1d board 
     int GetBoardPos(Cell Point)
@@ -57,15 +60,13 @@ namespace BoardData
         return res;
     }
 
-//  I have no idea with this
-    void init(int n, int m, int k)
+    void BuildBoard(int n, int m, int k)
     {
         Columns = n;
         Rows = m;
         Mines = k; 
-        Board.resize(n * k, 0);
+        Board.resize(n * m, 0);
 
-        
         for(int i = 0; i < Mines; i++)
         {
             Board[i] = MineCell; 
@@ -77,10 +78,71 @@ namespace BoardData
             for (int j = 0; j < Columns; j++)
             {
                 int id = GetBoardPos(Cell{i, j});
-                if(Board[id] == MineCell) continue;
+                if(Board[id] == MineCell) 
+                    continue;
                 Board[id] = CountMines(Cell{i, j});
             }
         }
+    }
+
+    void LoopOverComponent(int x, int y, int k)
+    {
+        int id = GetBoardPos(Cell{x, y});
+        if(x < 0 || x >= Rows) return ;
+        if(y < 0 || y >= Columns) return ;
+        if(ComponentID[id] != -1) return ;
+
+        ComponentID[id] = k;
+        Components[k].push_back(id);
+        
+        if(Board[GetBoardPos(Cell{x, y})] != 0) return ;
+
+        LoopOverComponent(x - 1, y, k);
+        LoopOverComponent(x + 1, y, k);
+        LoopOverComponent(x, y - 1, k);
+        LoopOverComponent(x, y + 1, k);
+
+    }
+
+    void SplitComponents()
+    {
+        ComponentID.resize(Rows * Columns, -1);
+        Components.push_back(std::vector<int> (0));
+
+        for(int i = 0; i < Rows; i++)
+        {
+            for(int j = 0; j < Columns; j++)
+            {
+                int id = GetBoardPos(Cell{i, j});
+                if(Board[id] == MineCell)
+                {
+                    ComponentID[id] = 0;
+                    Components[0].push_back(id);
+                    continue;
+                }
+            }
+        }
+
+        for(int i = 0; i < Rows; i++)
+        {
+            for(int j = 0; j < Columns; j++)
+            {
+                int id = GetBoardPos(Cell{i, j});
+                if(ComponentID[id] != -1) continue;
+
+                Components.push_back(std::vector<int> (0));
+
+                LoopOverComponent(i, j, Components.size() - 1);
+            }
+        }
+
+    }
+
+//  I have no idea with this
+    void init(int n, int m, int k)
+    {
+        BuildBoard(n, m, k);
+        SplitComponents();
     }
 
 // and this :))))
@@ -99,6 +161,14 @@ namespace BoardData
         {
             for(int j = 0; j < Columns; j++)
                 std::cout << std::setfill('0') << std::setw(2) << Board[GetBoardPos(Cell{i, j})] << "\t";
+            std::cout << std::endl;
+        }
+
+        std::cout << "Number of components: " << Components.size() << std::endl;
+        for(int i = 0; i < (int) Components.size(); i++)
+        {
+            for(int j : Components[i])
+                std::cout << j << " ";
             std::cout << std::endl;
         }
     }
