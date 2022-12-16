@@ -18,23 +18,37 @@ void GraphicsData::INIT()
     GraphicsData::font.loadFromFile("data/font/lemon_jelly/font.ttf");
 }
 
+Graphics::Button::Button()
+{
+    //nothing here :>
+}
+
 Graphics::Button::Button(std::string link)
 {
     Graphics::Button::image.loadFromFile(link);
 }
+
+void Graphics::Button::setImage(std::string link)
+{
+    Graphics::Button::image.loadFromFile(link);
+}
+
 sf::Sprite Graphics::Button::getSprite()
 {
     Graphics::Button::position = sf::Vector2f(0, 0);
     return sf::Sprite(Graphics::Button::image);
 }
+
 int Graphics::Button::getW()
 {
     return Graphics::Button::image.getSize().x;
 }
+
 int Graphics::Button::getH()
 {
     return Graphics::Button::image.getSize().y;
 }
+
 sf::Sprite Graphics::Button::getSprite(float x, float y)
 {
 
@@ -43,47 +57,52 @@ sf::Sprite Graphics::Button::getSprite(float x, float y)
     temp.setPosition(x, y);
     return temp;
 }
-void Graphics::StartingScreen::Draw()
+
+namespace StartingScreen
 {
-    // draw background picture
-    sf::Texture textureBackground;
-    textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
-    sf::Sprite spriteBackground(textureBackground);
-    spriteBackground.setScale(0.3893f, 0.30948f);
-    GraphicsData::screen.draw(spriteBackground);
+    Graphics::Button play, tutorial, highScore;
 
-    const int shilfButVer = 0;
-    const int shilfButHor = 150;
+    void Draw()
+    {
+        // draw background picture
+        sf::Texture textureBackground;
+        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
+        sf::Sprite spriteBackground(textureBackground);
+        spriteBackground.setScale(0.3893f, 0.30948f);
+        GraphicsData::screen.draw(spriteBackground);
 
-    //draw "logo"
-    sf::Texture logoTexture;
-    logoTexture.loadFromFile("data/title/title.png");
-    sf::Vector2u logoSize = logoTexture.getSize();
+        const int shilfButVer = 0;
+        const int shilfButHor = 150;
 
-    sf::Vector2f logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x) / 2.0, 120);
+        //draw "logo"
+        sf::Texture logoTexture;
+        logoTexture.loadFromFile("data/title/title.png");
+        sf::Vector2u logoSize = logoTexture.getSize();
 
-    sf::Sprite logo(logoTexture);
-    logo.setPosition(logoPosition);
-    GraphicsData::screen.draw(logo);
+        sf::Vector2f logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x) / 2.0, 120);
 
-    // draw "play" button
-    Button play("data/button/start_screen/play.png");
-    GraphicsData::screen.draw(play.getSprite(GraphicsData::WIDTH / 2 - play.getW() / 2 + shilfButVer, 
-                                             GraphicsData::HEIGHT / 2 - 2 * play.getH() + shilfButHor));
-    
+        sf::Sprite logo(logoTexture);
+        logo.setPosition(logoPosition);
+        GraphicsData::screen.draw(logo);
 
-    // draw "tutorial" button
-    Button tutorial("data/button/start_screen/tutorial.png");
-    
-    GraphicsData::screen.draw(tutorial.getSprite(GraphicsData::WIDTH / 2 - tutorial.getW() / 2 + shilfButVer,
-                                             GraphicsData::HEIGHT / 2 - tutorial.getH() / 2 + shilfButHor));
-    
-    // draw "high score" button
-    Button highScore("data/button/start_screen/high_score.png");
-    GraphicsData::screen.draw(highScore.getSprite(GraphicsData::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
-                                             GraphicsData::HEIGHT / 2 + highScore.getH() + shilfButHor));
-    
+        // draw "play" button
+        play.setImage("data/button/start_screen/play.png");
+        GraphicsData::screen.draw(play.getSprite(GraphicsData::WIDTH / 2 - play.getW() / 2 + shilfButVer, 
+                                                GraphicsData::HEIGHT / 2 - 2 * play.getH() + shilfButHor));
+        
 
+        // draw "tutorial" button
+        tutorial.setImage("data/button/start_screen/tutorial.png");
+        
+        GraphicsData::screen.draw(tutorial.getSprite(GraphicsData::WIDTH / 2 - tutorial.getW() / 2 + shilfButVer,
+                                                GraphicsData::HEIGHT / 2 - tutorial.getH() / 2 + shilfButHor));
+        
+        // draw "high score" button
+        highScore.setImage("data/button/start_screen/high_score.png");
+        GraphicsData::screen.draw(highScore.getSprite(GraphicsData::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
+                                                GraphicsData::HEIGHT / 2 + highScore.getH() + shilfButHor));
+        
+    }
 }
 
 void Graphics::RunGraphics()
@@ -93,7 +112,7 @@ void Graphics::RunGraphics()
     while(GraphicsData::screen.isOpen())
     {
         GraphicsData::screen.clear(sf::Color::White);    
-        Graphics::StartingScreen::Draw();
+        StartingScreen::Draw();
         GraphicsData::screen.display();
 
         sf::Event e;
