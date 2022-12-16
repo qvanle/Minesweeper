@@ -1,9 +1,11 @@
 #include <Data.hpp>
+#include <Graphics.hpp>
 
 int main()
 {
-    BoardData::init(20, 20, 80);
-    BoardData::show();
+
+    Graphics::RunGraphics();
+
     return 0;
 }
 

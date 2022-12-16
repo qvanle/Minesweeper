@@ -86,7 +86,8 @@ void LoopOverComponent(int x, int y, int k)
     BoardData::ComponentID[id] = k;
     BoardData::Components[k].push_back(id);
     
-    if(BoardData::Board[GetBoardPos(Cell{x, y})] != 0) return ;
+    if(BoardData::Board[GetBoardPos(Cell{x, y})] != 0) 
+        return ;
 
     LoopOverComponent(x - 1, y, k);
     LoopOverComponent(x + 1, y, k);
@@ -137,9 +138,9 @@ void BoardData::init(int n, int m, int k)
 }
 
 // and this :))))
-void init()
+void BoardData::init()
 {
-    return BoardData::init(10, 8, 16);
+    return BoardData::init(10, 10, 16);
 }
 
 // print variable to console
