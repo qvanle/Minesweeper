@@ -5,6 +5,9 @@
 #include <array>
 #include <iostream>
 #include <iomanip>
+#include <string>
+
+#include <SFML/Graphics.hpp>
 
 using CellType = int;
 using Cell = std::array<int, 2>;
@@ -25,6 +28,7 @@ namespace BoardData
 
     extern std::vector<std::vector<int> > Components;
     extern std::vector<int> ComponentID;
+
     void init(int n, int m, int k);
     void init();
     void show();
@@ -34,6 +38,9 @@ namespace BoardData
 namespace GraphicsData
 {
     extern std::vector<sf::Texture> icons;
-    extern const int Width;
-    extern const int Height;
+    extern sf::Font font;
+    extern int WIDTH;
+    extern int HEIGHT;
+    extern sf::RenderWindow screen;
+    void INIT();
 }
