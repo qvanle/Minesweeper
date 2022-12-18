@@ -5,23 +5,23 @@ namespace Graphics
     class Button
     {
     private:
-        sf::Texture image;
+        std::vector<sf::Texture> image;
+        int status = 0;
         sf::Vector2f position;
+        
     public:
+        
         int getW();
         int getH();
         Button();
         Button(std::string link);
         sf::Sprite getSprite();
         sf::Sprite getSprite(float x, float y);
-        void setImage(std::string);
+        void addImage(std::string link);
+        bool isMouseInside(float x, float y);
+        void setStatus(int value);
     };
-
-    namespace StartingScreen
-    {
-        void Draw();
-    }
-
-    void INIT();
-    void RunGraphics();
+    void delay(int t);
+    void Run();
 }
+

@@ -4,7 +4,7 @@
 int main()
 {
 
-    Graphics::RunGraphics();
+    Graphics::Run();
 
     return 0;
 }
