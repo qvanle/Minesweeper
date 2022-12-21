@@ -1,7 +1,6 @@
 #include <Graphics.hpp>
 //declare variable
 
-std::vector<sf::Texture> GraphicsData::icons;
 sf::Font GraphicsData::font;
 int GraphicsData::WIDTH = 1200;
 int GraphicsData::HEIGHT = 700;
@@ -10,12 +9,6 @@ sf::RenderWindow GraphicsData::screen(sf::VideoMode(GraphicsData::WIDTH, Graphic
 
 void GraphicsData::INIT()
 {
-    icons.resize(12);
-    for(int i = 0; i < 12; i++)
-    {
-        std::string direct = "data/icons/ocean/" + std::to_string(i) + ".jpg";
-        if(!icons[i].loadFromFile(direct));
-    }
     GraphicsData::font.loadFromFile("data/font/lemon_jelly/font.ttf");
 }
 
@@ -57,10 +50,18 @@ int Graphics::Button::getH()
 
 sf::Sprite Graphics::Button::getSprite(float x, float y)
 {
-
     Graphics::Button::position = sf::Vector2f(x, y);
     sf::Sprite temp(Graphics::Button::image[Graphics::Button::status]);
     temp.setPosition(x, y);
+    return temp;
+}
+
+sf::Sprite Graphics::Button::getSprite(float x, float y, float c)
+{
+    Graphics::Button::position = sf::Vector2f(x, y);
+    sf::Sprite temp(Graphics::Button::image[Graphics::Button::status]);
+    temp.setPosition(x, y);
+    temp.scale(c, c);
     return temp;
 }
 
@@ -94,6 +95,157 @@ void Graphics::delay(int t)
     return ;
 }   
 
+int Graphics::Button::getStatus()
+{
+    return Graphics::Button::status;
+}
+
+namespace GameScreen
+{
+    sf::Texture textureBackground, logoTexture;
+    sf::Sprite spriteBackground;
+    sf::Vector2u logoSize;
+    sf::Vector2f logoPosition;
+    sf::Sprite logo;
+
+    std::vector<Graphics::Button> Tab;
+
+    const int SHILF_DOWN = 50;
+    const int SHILF_RIGHT = 50;
+    const int ICON_WIDTH = 120;
+    const int ICON_HEIGHT = 120;
+    const float SCALE = 0.5;
+
+    int px = 0;
+    int py = 0;
+    int isDead = 0;
+
+    void INIT(int n, int m, int k)
+    {
+        isDead = false;
+        BoardData::init(n, m, k);
+        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
+        spriteBackground.setTexture(textureBackground);
+        spriteBackground.setScale(0.342f, 0.2824f);
+        logoTexture.loadFromFile("data/title/title.png");
+
+        
+        logoSize = logoTexture.getSize();
+        logoPosition = sf::Vector2f((int)(GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
+
+        logo.setTexture(logoTexture);
+        logo.setScale(0.6, 0.6);
+        logo.setPosition(logoPosition);
+
+        Tab.resize(n * m);
+
+        for(int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                int id = i * m + j;
+                Tab[id].addImage("data/icons/ocean/12.png");
+                Tab[id].addImage("data/icons/ocean/" + std::to_string(BoardData::Board[id]) + ".jpg");
+                Tab[id].addImage("data/icons/ocean/9.jpg");
+                Tab[id].addImage("data/icons/ocean/10.jpg");
+            }
+        }
+    }
+
+    void draw()
+    {
+        GraphicsData::screen.draw(spriteBackground);
+
+        std::cout << Tab.size() << std::endl;
+
+        for(int i = 0; i < 10; i++)
+        {
+            for(int j = 0; j < 10; j++)
+            {
+                int id = (i + px) * BoardData::Columns + (j + py);
+                GraphicsData::screen.draw(Tab[id].getSprite(j * ICON_WIDTH * SCALE + SHILF_RIGHT, 
+                                                            i * ICON_HEIGHT * SCALE + SHILF_DOWN, SCALE));
+            }
+        } 
+    }
+
+    void openCells(int x, int y)
+    {
+        if(x < 0 || x >= BoardData::Rows) return ;
+        if(y < 0 || y >= BoardData::Columns) return ;
+        
+        int id = x * BoardData::Columns + y;
+        if(Tab[id].getStatus() != 0) return ;
+        Tab[id].setStatus(1);
+
+        if(BoardData::Board[id] != 0) return ; 
+
+        openCells(x - 1, y);
+        openCells(x + 1, y);
+        openCells(x, y - 1);
+        openCells(x, y + 1); 
+        return ;
+    }
+    bool isOpenCells(int x, int y)
+    {
+        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+
+        if(x < 0 || x >= 10) return false;
+        if(y < 0 || y >= 10) return false;
+
+        x = x + px;
+        y = y + py;
+        openCells(x, y);
+        return true;
+    }
+
+    void Run(int n, int m, int k)
+    {
+        INIT(n, m, k);
+
+        while (GraphicsData::screen.isOpen())
+        {
+            GraphicsData::screen.clear(sf::Color::White);
+            draw();
+            GraphicsData::screen.display();
+
+            sf::Event e;
+            while(GraphicsData::screen.pollEvent(e))
+            {
+                switch(e.type)
+                {
+                    case sf::Event::Closed:
+                        GraphicsData::screen.close();
+                        break;
+
+                    case sf::Event::KeyPressed:
+                        if(e.key.code == sf::Keyboard::A || e.key.code == sf::Keyboard::Left)
+                            if(py > 0) py--;
+                        if(e.key.code == sf::Keyboard::D || e.key.code == sf::Keyboard::Right)
+                            if(py + 10 <= BoardData::Columns) py++;
+                        if(e.key.code == sf::Keyboard::W || e.key.code == sf::Keyboard::Up)
+                            if(px > 0) px--;
+                        if(e.key.code == sf::Keyboard::S || e.key.code == sf::Keyboard::Down)
+                            if(px + 10 <= BoardData::Rows) px++;
+                        break;
+
+                    case sf::Event::MouseButtonPressed:
+                        if(e.mouseButton.button == sf::Mouse::Left)
+                        {
+                            isOpenCells(e.mouseButton.y, e.mouseButton.x);
+                        }
+                        if(e.mouseButton.button == sf::Mouse::Right)
+                        {
+                            
+                        }
+                        break;
+                }
+            }
+        }
+        
+    }
+}
 
 namespace NewGameModeScreen
 {
@@ -212,6 +364,18 @@ namespace NewGameModeScreen
                         if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
                         {
                             goback.setStatus(0);
+                            return ;
+                        }
+                        if(easy.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            easy.setStatus(0);
+                            GameScreen::Run(10, 10, 16);
+                            return ;
+                        }
+                        if(medium.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            medium.setStatus(0);
+                            GameScreen::Run(20, 20, 80);
                             return ;
                         }
                         break;
@@ -341,7 +505,10 @@ namespace StartingScreen
     sf::Vector2u logoSize;
     sf::Vector2f logoPosition;
     sf::Sprite logo, spriteBackground;
-    
+
+    const int shilfButVer = 0; // shilf button vertical
+    const int shilfButHor = 150; // shilf button horizonal
+
     void INIT()
     {
     
@@ -371,9 +538,6 @@ namespace StartingScreen
     {
         // draw background picture
         GraphicsData::screen.draw(spriteBackground);
-
-        const int shilfButVer = 0; // shilf button vertical
-        const int shilfButHor = 150; // shilf button horizonal
 
         //draw "logo"
 

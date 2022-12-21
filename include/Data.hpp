@@ -25,9 +25,7 @@ namespace BoardData
     extern std::vector<CellType> Board;
     extern int Columns, Rows;
     extern int Mines;
-
-    extern std::vector<std::vector<int> > Components;
-    extern std::vector<int> ComponentID;
+    extern std::vector<int> deadCells;
 
     void init(int n, int m, int k);
     void init();
@@ -37,7 +35,6 @@ namespace BoardData
 
 namespace GraphicsData
 {
-    extern std::vector<sf::Texture> icons;
     extern sf::Font font;
     extern int WIDTH;
     extern int HEIGHT;

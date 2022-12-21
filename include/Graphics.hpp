@@ -17,10 +17,13 @@ namespace Graphics
         Button(std::string link);
         sf::Sprite getSprite();
         sf::Sprite getSprite(float x, float y);
+        sf::Sprite getSprite(float x, float y, float c);
         void addImage(std::string link);
         bool isMouseInside(float x, float y);
         void setStatus(int value);
+        int getStatus();
     };
+
     void delay(int t);
     void Run();
 }
