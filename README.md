@@ -8,5 +8,10 @@ you need to install SFML
 sudo apt-get update
 sudo apt-get install libsfml-dev
 ```
-
+after that you need open a terminal and go to the direct that you save this project.
+run this command
+```
+make GetGame
+```
+after that, if the game doesn't start or you want to play again, run file MyGame.out.
 ## Game play
