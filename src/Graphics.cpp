@@ -102,17 +102,30 @@ int Graphics::Button::getStatus()
 
 namespace DeadScreen
 {
+    const int shilfButVer = 0; // shilf button vertical
+    const int shilfButHor = -80; // shilf button horizonal
+
     sf::Texture textureBackground, logoTexture, titleTexture;
     sf::Sprite spriteBackground;
     sf::Vector2u logoSize, titleSize;
     sf::Vector2f logoPosition, titlePosition;
     sf::Sprite logo, title;
+    
+    Graphics::Button goback, highScore;
 
     void draw()
     {
         GraphicsData::screen.draw(spriteBackground);
         GraphicsData::screen.draw(title);
+
+        // draw "high score" button
+        GraphicsData::screen.draw(highScore.getSprite(GraphicsData::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
+                                                GraphicsData::HEIGHT / 2 + highScore.getH() / 2 + shilfButHor));
+        // draw "go back" button
+        GraphicsData::screen.draw(goback.getSprite(GraphicsData::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
+                                                GraphicsData::HEIGHT / 2 + 2 * goback.getH() + shilfButHor));
     }
+    
     void INIT()
     {
         textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
@@ -133,7 +146,19 @@ namespace DeadScreen
         title.setTexture(titleTexture);
         title.setPosition(titlePosition);
 
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
+
+        highScore.addImage("data/button/high_score.png");
+        highScore.addImage("data/button/choosing_high_score.png");
     }
+    
+    void mouseChangeStatus(int x, int y)
+    {
+        goback.isMouseInside(x, y);
+        highScore.isMouseInside(x, y);
+    }
+
     void Run()
     {
         INIT();
@@ -151,10 +176,24 @@ namespace DeadScreen
                     case sf::Event::Closed:
                         GraphicsData::screen.close();
                         break;
+                    case sf::Event::MouseButtonPressed:
+                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            goback.setStatus(0);
+                            return ; 
+                        }
+                        break;
+                    case sf::Event::MouseMoved:
+                        mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
                 }
             }
         }
     }
+}
+
+namespace WinningScreen
+{
+
 }
 
 namespace GameScreen
@@ -226,6 +265,36 @@ namespace GameScreen
         }
     }
 
+    void INIT(int x, int y)
+    {
+
+        int n = BoardData::Columns;
+        int m = BoardData::Rows;
+        int k = BoardData::Mines;
+        
+        isDead = false;
+        cellsLeft = n * m;
+        mineLeft = k;
+        flags = 0;
+        
+        BoardData::init(n, m, k, x, y);
+
+        Tab.clear();
+        Tab.resize(n * m);
+
+        for(int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                int id = i * m + j;
+                Tab[id].addImage("data/icons/ocean/12.png");
+                Tab[id].addImage("data/icons/ocean/" + std::to_string(BoardData::Board[id]) + ".jpg");
+                Tab[id].addImage("data/icons/ocean/9.jpg");
+                Tab[id].addImage("data/icons/ocean/10.jpg");
+            }
+        }
+    }
+
     void draw()
     {
         GraphicsData::screen.draw(spriteBackground);
@@ -275,16 +344,24 @@ namespace GameScreen
         return ;
     }
 
-    bool isOpenCells(int x, int y)
+    bool isOpenCells(int x, int y, bool &firstTry)
     {
         x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
         y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
-
+        
         x = x + px;
         y = y + py;
+        
+        if(firstTry) 
+        {
+            firstTry = false;
+            INIT(x, y);
+        }
+
+        
         openCells(x, y);
 
         return true;
@@ -367,6 +444,8 @@ namespace GameScreen
     {
         INIT(n, m, k);
         
+        bool firstTry = true;
+
         GraphicsData::screen.clear(sf::Color::White);
         
         while (GraphicsData::screen.isOpen())
@@ -405,7 +484,7 @@ namespace GameScreen
                     case sf::Event::MouseButtonPressed:
                         if(e.mouseButton.button == sf::Mouse::Left)
                         {
-                            isOpenCells(e.mouseButton.y, e.mouseButton.x);
+                            isOpenCells(e.mouseButton.y, e.mouseButton.x, firstTry);
                         }
                         if(e.mouseButton.button == sf::Mouse::Right)
                         {
@@ -626,7 +705,6 @@ namespace ChooseGameDataSreen
         GraphicsData::screen.draw(_continue.getSprite(GraphicsData::WIDTH / 2 - _continue.getW() / 2 + shilfButVer,
                                                 GraphicsData::HEIGHT / 2 - _continue.getH() / 2 + shilfButHor));
         
-
         // draw "go back" button
         GraphicsData::screen.draw(goback.getSprite(GraphicsData::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
                                                 GraphicsData::HEIGHT / 2 + goback.getH() + shilfButHor));

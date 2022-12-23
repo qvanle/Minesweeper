@@ -28,6 +28,7 @@ namespace BoardData
     extern std::vector<int> deadCells;
 
     void init(int n, int m, int k);
+    void init(int n, int m, int k, int x, int y);
     void init();
     void show();
 }

@@ -49,7 +49,7 @@ int CountMines(Cell Point)
     return res;
 }
 
-void BuildBoard(int n, int m, int k)
+void BuildBoard(int n, int m, int k, int x = -1, int y = -1)
 {
     BoardData::Columns = n;
     BoardData::Rows = m;
@@ -62,7 +62,11 @@ void BuildBoard(int n, int m, int k)
     {
         BoardData::Board[i] = BoardData::MineCell; 
     }
-    std::shuffle(BoardData::Board.begin(), BoardData::Board.end(), rng);
+    int loop = 20;
+    do
+    {
+        std::shuffle(BoardData::Board.begin(), BoardData::Board.end(), rng);
+    }while(CountMines(Cell{x, y}) != 0 && loop--);
 
     for(int i = 0; i < BoardData::Rows; i++)
     {
@@ -83,6 +87,11 @@ void BuildBoard(int n, int m, int k)
 void BoardData::init(int n, int m, int k)
 {
     BuildBoard(n, m, k);
+}
+
+void BoardData::init(int n, int m, int k, int x, int y)
+{
+    BuildBoard(n, m, k, x, y);
 }
 
 // and this :))))
