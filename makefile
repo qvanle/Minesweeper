@@ -3,7 +3,6 @@ INCLUDE_PATH :=/home/qvanle/College/CS161/Minesweeper/include
 INIT:
 	find lib || mkdir lib
 
-
 Building: INIT
 	clear
 	g++ -c src/BoardData.cpp -I $(INCLUDE_PATH) -o lib/BoardData.o
@@ -17,6 +16,8 @@ Linking:
 
 Compiling: Building Linking
 
+GetGame: Compiling
+	./MyGame.out
 
 GetLog: Compiling
 	./MyGame.out > .log
