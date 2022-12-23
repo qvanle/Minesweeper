@@ -189,11 +189,98 @@ namespace DeadScreen
             }
         }
     }
+
 }
 
 namespace WinningScreen
 {
+    const int shilfButVer = 0; // shilf button vertical
+    const int shilfButHor = -80; // shilf button horizonal
 
+    sf::Texture textureBackground, logoTexture, titleTexture;
+    sf::Sprite spriteBackground;
+    sf::Vector2u logoSize, titleSize;
+    sf::Vector2f logoPosition, titlePosition;
+    sf::Sprite logo, title;
+    
+    Graphics::Button goback, highScore;
+
+    void draw()
+    {
+        GraphicsData::screen.draw(spriteBackground);
+        GraphicsData::screen.draw(title);
+
+        // draw "high score" button
+        GraphicsData::screen.draw(highScore.getSprite(GraphicsData::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
+                                                GraphicsData::HEIGHT / 2 + highScore.getH() / 2 + shilfButHor));
+        // draw "go back" button
+        GraphicsData::screen.draw(goback.getSprite(GraphicsData::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
+                                                GraphicsData::HEIGHT / 2 + 2 * goback.getH() + shilfButHor));
+    }
+    
+    void INIT()
+    {
+        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        spriteBackground.setTexture(textureBackground);
+
+
+        logoTexture.loadFromFile("data/title/header.png");
+        logoSize = logoTexture.getSize();
+        logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
+        logo.setTexture(logoTexture);
+        logo.setScale(0.6, 0.6);
+        logo.setPosition(logoPosition);
+
+
+        titleTexture.loadFromFile("data/title/you_win.png");
+        titleSize = titleTexture.getSize();
+        titlePosition = sf::Vector2f((GraphicsData::WIDTH - titleSize.x) / 2.0, (GraphicsData::HEIGHT - titleSize.y) / 2.0 - 200);
+        title.setTexture(titleTexture);
+        title.setPosition(titlePosition);
+
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
+
+        highScore.addImage("data/button/high_score.png");
+        highScore.addImage("data/button/choosing_high_score.png");
+    }
+    
+    void mouseChangeStatus(int x, int y)
+    {
+        goback.isMouseInside(x, y);
+        highScore.isMouseInside(x, y);
+    }
+
+    void Run()
+    {
+        INIT();
+        while(GraphicsData::screen.isOpen())
+        {
+            GraphicsData::screen.clear(sf::Color::White);
+            draw();
+            GraphicsData::screen.display();
+
+            sf::Event e;
+            while(GraphicsData::screen.pollEvent(e))
+            {
+                switch(e.type)
+                {
+                    case sf::Event::Closed:
+                        GraphicsData::screen.close();
+                        break;
+                    case sf::Event::MouseButtonPressed:
+                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            goback.setStatus(0);
+                            return ; 
+                        }
+                        break;
+                    case sf::Event::MouseMoved:
+                        mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
+                }
+            }
+        }
+    }
 }
 
 namespace GameScreen
@@ -425,7 +512,7 @@ namespace GameScreen
         }
     }
 
-    bool isOpenAround(int x, int y)
+    bool isOpenAround(int x, int y, bool &firstTry)
     {
         x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
         y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
@@ -435,6 +522,13 @@ namespace GameScreen
 
         x = x + px;
         y = y + py;
+
+        if(firstTry) 
+        {
+            firstTry = false;
+            INIT(x, y);
+        }
+
         openAround(x, y);
 
         return true;
@@ -456,6 +550,15 @@ namespace GameScreen
                 GraphicsData::screen.display();
                 Graphics::delay(2000);
                 DeadScreen::Run();
+                return ;
+            }
+            if(cellsLeft == 0 && mineLeft == 0)
+            {
+                std::cout <<"winning\n";
+                draw();
+                GraphicsData::screen.display();
+                Graphics::delay(1000);
+                WinningScreen::Run();
                 return ;
             }
             draw();
@@ -492,7 +595,7 @@ namespace GameScreen
                         }
                         if(e.mouseButton.button == sf::Mouse::Middle)
                         {
-                            isOpenAround(e.mouseButton.y, e.mouseButton.x);
+                            isOpenAround(e.mouseButton.y, e.mouseButton.x, firstTry);
                         }
                         break;
                 }
@@ -617,21 +720,28 @@ namespace NewGameModeScreen
                         mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
                         break;
                     case sf::Event::MouseButtonPressed:
-                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
-                        {
-                            goback.setStatus(0);
-                            return ;
-                        }
-                        if(easy.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        
+                        if(easy.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel == 0)
                         {
                             easy.setStatus(0);
                             GameScreen::Run(10, 10, 16);
                             return ;
                         }
-                        if(medium.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        if(medium.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel != 2)
                         {
                             medium.setStatus(0);
-                            GameScreen::Run(20, 20, 80);
+                            GameScreen::Run(16, 16, 64);
+                            return ;
+                        }
+                        if(hard.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel != 1)
+                        {
+                            hard.setStatus(0);
+                            GameScreen::Run(32, 32, 256);
+                            return ;
+                        }
+                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel == 2)
+                        {   
+                            goback.setStatus(0);
                             return ;
                         }
                         break;
