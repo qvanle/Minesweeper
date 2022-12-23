@@ -1,18 +1,9 @@
-#include <vector>
-#include <random>
-#include <chrono>
-#include <algorithm>
-#include <array>
-#include <iostream>
-#include <iomanip>
-#include <string>
-
-#include <SFML/Graphics.hpp>
+#include <INIT.hpp>
 
 using CellType = int;
 using Cell = std::array<int, 2>;
 
-namespace BoardData
+namespace SysVar
 {
     //  declare constant
     extern const CellType SafeCells[];
@@ -33,13 +24,4 @@ namespace BoardData
     void init(int n, int m, int k, int x, int y);
     void init();
     void show();
-}
-
-namespace GraphicsData
-{
-    extern sf::Font font;
-    extern int WIDTH;
-    extern int HEIGHT;
-    extern sf::RenderWindow screen;
-    void INIT();
 }

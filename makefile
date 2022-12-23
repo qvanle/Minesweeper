@@ -1,12 +1,13 @@
 INCLUDE_PATH :=/home/qvanle/College/CS161/Minesweeper/include
 
 INIT:
-	find lib || mkdir lib
-
-Building: INIT
+	rm -rf lib
+	mkdir lib
 	clear
-	g++ -c src/BoardData.cpp -I $(INCLUDE_PATH) -o lib/BoardData.o
+Building: INIT
+	g++ -c src/InitData.cpp -I $(INCLUDE_PATH) -o lib/InitData.o
 	g++ -c src/Graphics.cpp -I $(INCLUDE_PATH) -o lib/Graphics.o
+	g++ -c src/Button.cpp -I $(INCLUDE_PATH) -o lib/Button.o
 	g++ -c src/main.cpp -I $(INCLUDE_PATH) -o lib/main.o
 
 
