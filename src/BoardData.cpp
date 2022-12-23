@@ -54,6 +54,8 @@ void BuildBoard(int n, int m, int k)
     BoardData::Columns = n;
     BoardData::Rows = m;
     BoardData::Mines = k; 
+
+    BoardData::Board.clear();
     BoardData::Board.resize(n * m, 0);
 
     for(int i = 0; i < BoardData::Mines; i++)

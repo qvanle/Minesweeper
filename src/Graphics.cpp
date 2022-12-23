@@ -100,6 +100,63 @@ int Graphics::Button::getStatus()
     return Graphics::Button::status;
 }
 
+namespace DeadScreen
+{
+    sf::Texture textureBackground, logoTexture, titleTexture;
+    sf::Sprite spriteBackground;
+    sf::Vector2u logoSize, titleSize;
+    sf::Vector2f logoPosition, titlePosition;
+    sf::Sprite logo, title;
+
+    void draw()
+    {
+        GraphicsData::screen.draw(spriteBackground);
+        GraphicsData::screen.draw(title);
+    }
+    void INIT()
+    {
+        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        spriteBackground.setTexture(textureBackground);
+
+
+        logoTexture.loadFromFile("data/title/header.png");
+        logoSize = logoTexture.getSize();
+        logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
+        logo.setTexture(logoTexture);
+        logo.setScale(0.6, 0.6);
+        logo.setPosition(logoPosition);
+
+
+        titleTexture.loadFromFile("data/title/lose.png");
+        titleSize = titleTexture.getSize();
+        titlePosition = sf::Vector2f((GraphicsData::WIDTH - titleSize.x) / 2.0, (GraphicsData::HEIGHT - titleSize.y) / 2.0 - 200);
+        title.setTexture(titleTexture);
+        title.setPosition(titlePosition);
+
+    }
+    void Run()
+    {
+        INIT();
+        while(GraphicsData::screen.isOpen())
+        {
+            GraphicsData::screen.clear(sf::Color::White);
+            draw();
+            GraphicsData::screen.display();
+
+            sf::Event e;
+            while(GraphicsData::screen.pollEvent(e))
+            {
+                switch(e.type)
+                {
+                    case sf::Event::Closed:
+                        GraphicsData::screen.close();
+                        break;
+                }
+            }
+        }
+    }
+}
+
 namespace GameScreen
 {
     sf::Texture textureBackground, logoTexture;
@@ -118,25 +175,42 @@ namespace GameScreen
 
     int px = 0;
     int py = 0;
-    int isDead = 0;
+    bool isDead = 0;
+    
+    int cellsLeft;
+    int mineLeft;
+    int flags;
+
+    sf::RectangleShape horLine(sf::Vector2f(ICON_WIDTH * SCALE + 5 , 2.f));
+    sf::RectangleShape verLine(sf::Vector2f(2.f, ICON_HEIGHT * SCALE + 5));
+    sf::Color frameColor(60, 60, 60);
 
     void INIT(int n, int m, int k)
     {
-        isDead = false;
-        BoardData::init(n, m, k);
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
-        spriteBackground.setTexture(textureBackground);
-        spriteBackground.setScale(0.342f, 0.2824f);
-        logoTexture.loadFromFile("data/title/title.png");
 
-        
+        horLine.setFillColor(frameColor);
+        verLine.setFillColor(frameColor);
+        isDead = false;
+        cellsLeft = n * m;
+        mineLeft = k;
+        flags = 0;
+
+        BoardData::init(n, m, k);
+
+
+        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        spriteBackground.setTexture(textureBackground);
+
+        logoTexture.loadFromFile("data/title/header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((int)(GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
+
 
         logo.setTexture(logoTexture);
         logo.setScale(0.6, 0.6);
         logo.setPosition(logoPosition);
 
+        Tab.clear();
         Tab.resize(n * m);
 
         for(int i = 0; i < n; i++)
@@ -155,16 +229,27 @@ namespace GameScreen
     void draw()
     {
         GraphicsData::screen.draw(spriteBackground);
-
-        std::cout << Tab.size() << std::endl;
-
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i <= 10; i++)
         {
-            for(int j = 0; j < 10; j++)
+            for(int j = 0; j <= 10; j++)
             {
                 int id = (i + px) * BoardData::Columns + (j + py);
-                GraphicsData::screen.draw(Tab[id].getSprite(j * ICON_WIDTH * SCALE + SHILF_RIGHT, 
-                                                            i * ICON_HEIGHT * SCALE + SHILF_DOWN, SCALE));
+                
+                if(i != 10 && j != 10)
+                {
+                    if(isDead && BoardData::Board[id] == BoardData::MineCell)
+                        Tab[id].setStatus(1);
+                    GraphicsData::screen.draw(Tab[id].getSprite(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT, 
+                                                                i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN, SCALE));
+                }
+
+                verLine.setPosition(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT - 2, 
+                                    i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN - 2);
+                horLine.setPosition(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT - 2, 
+                                    i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN - 2);
+
+                if(i != 10) GraphicsData::screen.draw(verLine);
+                if(j != 10) GraphicsData::screen.draw(horLine);
             }
         } 
     }
@@ -175,10 +260,13 @@ namespace GameScreen
         if(y < 0 || y >= BoardData::Columns) return ;
         
         int id = x * BoardData::Columns + y;
-        if(Tab[id].getStatus() != 0) return ;
+        if(Tab[id].getStatus() == 1 || Tab[id].getStatus() == 2) return ; 
         Tab[id].setStatus(1);
 
-        if(BoardData::Board[id] != 0) return ; 
+        cellsLeft--;
+
+        if(BoardData::Board[id] == BoardData::MineCell) isDead = true;
+        if(BoardData::Board[id] != BoardData::SafeCells[0]) return ; 
 
         openCells(x - 1, y);
         openCells(x + 1, y);
@@ -186,6 +274,7 @@ namespace GameScreen
         openCells(x, y + 1); 
         return ;
     }
+
     bool isOpenCells(int x, int y)
     {
         x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
@@ -197,16 +286,99 @@ namespace GameScreen
         x = x + px;
         y = y + py;
         openCells(x, y);
+
+        return true;
+    }
+
+    void flagCell(int x, int y)
+    {
+        int id = x * BoardData::Columns + y;
+        
+        if(Tab[id].getStatus() == 3) Tab[id].setStatus(0);
+        else if(Tab[id].getStatus() == 2) 
+        {
+            flags--;
+            cellsLeft++;
+            if(BoardData::Board[id] == BoardData::MineCell) mineLeft++;
+            Tab[id].setStatus(3);
+        }
+        else if(Tab[id].getStatus() == 0) 
+        {
+            flags++;
+            cellsLeft--;
+            if(BoardData::Board[id] == BoardData::MineCell) mineLeft--;
+            Tab[id].setStatus(2);
+        }
+    }
+
+    bool isFlagCells(int x, int y)
+    {
+        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+
+        if(x < 0 || x >= 10) return false;
+        if(y < 0 || y >= 10) return false;
+
+        x = x + px;
+        y = y + py;
+
+        flagCell(x, y);
+
+        return true;
+    }
+    
+    void openAround(int x, int y)
+    {
+
+        int id = x * BoardData::Columns + y;
+
+        for(int i = -1; i <= 1; i++)
+        {
+            for(int j = -1; j <= 1; j++)
+            {
+                int nx = x + i;
+                int ny = y + j;
+                int nid = nx * BoardData::Columns + ny;
+    
+                if(nx < 0 || nx >= BoardData::Columns) continue;
+                if(ny < 0 || ny >= BoardData::Rows) continue;
+                
+                openCells(nx, ny);
+            }
+        }
+    }
+
+    bool isOpenAround(int x, int y)
+    {
+        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+
+        if(x < 0 || x >= 10) return false;
+        if(y < 0 || y >= 10) return false;
+
+        x = x + px;
+        y = y + py;
+        openAround(x, y);
+
         return true;
     }
 
     void Run(int n, int m, int k)
     {
         INIT(n, m, k);
-
+        
+        GraphicsData::screen.clear(sf::Color::White);
+        
         while (GraphicsData::screen.isOpen())
         {
-            GraphicsData::screen.clear(sf::Color::White);
+            if(isDead)
+            {
+                draw();
+                GraphicsData::screen.display();
+                Graphics::delay(2000);
+                DeadScreen::Run();
+                return ;
+            }
             draw();
             GraphicsData::screen.display();
 
@@ -223,11 +395,11 @@ namespace GameScreen
                         if(e.key.code == sf::Keyboard::A || e.key.code == sf::Keyboard::Left)
                             if(py > 0) py--;
                         if(e.key.code == sf::Keyboard::D || e.key.code == sf::Keyboard::Right)
-                            if(py + 10 <= BoardData::Columns) py++;
+                            if(py + 10 < BoardData::Columns) py++;
                         if(e.key.code == sf::Keyboard::W || e.key.code == sf::Keyboard::Up)
                             if(px > 0) px--;
                         if(e.key.code == sf::Keyboard::S || e.key.code == sf::Keyboard::Down)
-                            if(px + 10 <= BoardData::Rows) px++;
+                            if(px + 10 < BoardData::Rows) px++;
                         break;
 
                     case sf::Event::MouseButtonPressed:
@@ -237,7 +409,11 @@ namespace GameScreen
                         }
                         if(e.mouseButton.button == sf::Mouse::Right)
                         {
-                            
+                            isFlagCells(e.mouseButton.y, e.mouseButton.x);
+                        }
+                        if(e.mouseButton.button == sf::Mouse::Middle)
+                        {
+                            isOpenAround(e.mouseButton.y, e.mouseButton.x);
                         }
                         break;
                 }
@@ -262,7 +438,7 @@ namespace NewGameModeScreen
         textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
         spriteBackground.setTexture(textureBackground);
         spriteBackground.setScale(0.342f, 0.2824f);
-        logoTexture.loadFromFile("data/title/title.png");
+        logoTexture.loadFromFile("data/title/header.png");
                 
         
         logoSize = logoTexture.getSize();
@@ -271,20 +447,20 @@ namespace NewGameModeScreen
         logo.setTexture(logoTexture);
         logo.setPosition(logoPosition);
 
-        easy.addImage("data/button/game_mode/easy.png");
-        easy.addImage("data/button/game_mode/choosing_easy.png");
+        easy.addImage("data/button/easy.png");
+        easy.addImage("data/button/choosing_easy.png");
         
-        medium.addImage("data/button/game_mode/medium.png");
-        medium.addImage("data/button/game_mode/choosing_medium.png");
+        medium.addImage("data/button/medium.png");
+        medium.addImage("data/button/choosing_medium.png");
 
-        hard.addImage("data/button/game_mode/hard.png");
-        hard.addImage("data/button/game_mode/choosing_hard.png");
+        hard.addImage("data/button/hard.png");
+        hard.addImage("data/button/choosing_hard.png");
 
-        custom.addImage("data/button/game_mode/custom.png");
-        custom.addImage("data/button/game_mode/choosing_custom.png");
+        custom.addImage("data/button/custom.png");
+        custom.addImage("data/button/choosing_custom.png");
 
-        goback.addImage("data/button/game_mode/goback.png");
-        goback.addImage("data/button/game_mode/choosing_goback.png");
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
 
     }
 
@@ -340,6 +516,7 @@ namespace NewGameModeScreen
         custom.setStatus(0);
         goback.setStatus(0);
     }
+    
     void Run()
     {
         INIT();
@@ -411,7 +588,7 @@ namespace ChooseGameDataSreen
         spriteBackground.setTexture(textureBackground);
         spriteBackground.setScale(0.342f, 0.2824f);
 
-        logoTexture.loadFromFile("data/title/title.png");
+        logoTexture.loadFromFile("data/title/header.png");
         logoSize = logoTexture.getSize();
 
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x) / 2.0, 120);
@@ -419,14 +596,14 @@ namespace ChooseGameDataSreen
         logo.setTexture(logoTexture);
         logo.setPosition(logoPosition);
 
-        newGame.addImage("data/button/game_mode/newgame.png");
-        newGame.addImage("data/button/game_mode/choosing_newgame.png");
+        newGame.addImage("data/button/newgame.png");
+        newGame.addImage("data/button/choosing_newgame.png");
 
-        _continue.addImage("data/button/game_mode/continue.png");
-        _continue.addImage("data/button/game_mode/choosing_continue.png");
+        _continue.addImage("data/button/continue.png");
+        _continue.addImage("data/button/choosing_continue.png");
 
-        goback.addImage("data/button/game_mode/goback.png");
-        goback.addImage("data/button/game_mode/choosing_goback.png");
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
     }
 
     void draw()
@@ -517,21 +694,21 @@ namespace StartingScreen
         spriteBackground.setScale(0.342f, 0.2824f);
         
 
-        logoTexture.loadFromFile("data/title/title.png");
+        logoTexture.loadFromFile("data/title/header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x) / 2.0, 120);
         logo.setTexture(logoTexture);
         logo.setPosition(logoPosition);
 
 
-        play.addImage("data/button/start_screen/play.png");
-        play.addImage("data/button/start_screen/choosing_play.png");
+        play.addImage("data/button/play.png");
+        play.addImage("data/button/choosing_play.png");
 
-        tutorial.addImage("data/button/start_screen/tutorial.png");
-        tutorial.addImage("data/button/start_screen/choosing_tutorial.png");
+        tutorial.addImage("data/button/tutorial.png");
+        tutorial.addImage("data/button/choosing_tutorial.png");
 
-        highScore.addImage("data/button/start_screen/high_score.png");
-        highScore.addImage("data/button/start_screen/choosing_high_score.png");
+        highScore.addImage("data/button/high_score.png");
+        highScore.addImage("data/button/choosing_high_score.png");
     }
 
     void Draw()

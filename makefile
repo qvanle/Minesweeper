@@ -21,6 +21,8 @@ Compiling: Building Linking
 GetLog: Compiling
 	./MyGame.out > .log
 
+DEBUG:
+	gdb ./MyGame.out
 
 Cleaning: INIT
 	find MyGame.out && rm MyGame.out || echo MyGame.out is not exist
