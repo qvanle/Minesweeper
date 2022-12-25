@@ -599,6 +599,13 @@ void newGameChangeButton(Screen &scr)
     }
 }
 
+Screen Playing(int id)
+{
+    Screen s;
+    s.setID(id);
+    s.setMaxScrolls(0);
+}
+
 Screen NewGame(int id)
 {
     Screen s;
@@ -742,7 +749,7 @@ void StartGame()
 
     scrs.emplace_back(NewGame(2));// scrs[2]: new-game screen
 
-    scrs.emplace_back();// scrs[3]: game screen
+    scrs.emplace_back(Playing(3));// scrs[3]: game screen
     
     scrs.emplace_back();// scrs[4]: game-end screen
 
@@ -759,14 +766,15 @@ void StartGame()
         sf::Event e;
         while(GraVar::screen.pollEvent(e))
         {
-
             switch(e.type)
             {
                 case sf::Event::Closed:
                     GraVar::screen.close();
                     break;
                 case sf::Event::MouseButtonPressed:
-                    status = scrs[status].MouseChangeScreen(e.mouseButton.x, e.mouseButton.y);
+                    Button key = scrs[status].MouseClickButton(e.mouseButton.x, e.mouseButton.y);
+                    status = key.getScreenID();
+                    scrs[status].setLastButton(key);
                     break;
                 case sf::Event::MouseMoved:
                     scrs[status].MouseChangeStatus(e.mouseMove.x, e.mouseMove.y);

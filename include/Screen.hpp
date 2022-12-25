@@ -7,7 +7,7 @@ private:
     int id, maxScrolls, scrolls;
     sf::Texture background, title;
     std::vector<Button> buttons; // function button
-
+    Button lastButton;
 public:
     void setID(int i);
     int getID();
@@ -36,9 +36,10 @@ public:
     int ButtonW(int id);
     int ButtonH(int id);
     sf::Sprite getButton(int id);
-
+    void setLastButton(Button key);
+    
     void MouseChangeStatus(int x, int y);
-    int MouseChangeScreen(int x, int y);
+    int MouseClickButton(int x, int y);
 
     sf::Sprite getTitle();
     void addTitle(std::string link);

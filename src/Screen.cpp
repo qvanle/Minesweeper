@@ -114,6 +114,11 @@ sf::Sprite Screen::getButton(int id)
     return Screen::buttons[id].getSprite();
 }
 
+void Screen::setLastButton(Button key)
+{
+    lastButton = key;
+}
+
 void Screen::MouseChangeStatus(int x, int y)
 {
     int n = Screen::buttonsSize();
@@ -125,7 +130,7 @@ void Screen::MouseChangeStatus(int x, int y)
         }
 }
 
-int Screen::MouseChangeScreen(int x, int y)
+int Screen::MouseClickButton(int x, int y)
 {
     int n = Screen::buttonsSize();
     for(int i = n - 1; i >= n - 6 && i >= 0; i--)
