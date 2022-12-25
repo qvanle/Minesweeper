@@ -1,6 +1,7 @@
 #include <GraphicsVariables.hpp>
 #include <SystemVariables.hpp>
-#include <Button.hpp>
+//#include <Button.hpp>
+#include <Screen.hpp>
 
 //declare variable
 
@@ -24,8 +25,8 @@ void delay(int t)
 
 namespace DeadScreen
 {
-    const int shilfButVer = 0; // shilf button vertical
-    const int shilfButHor = -80; // shilf button horizonal
+    const int shiftButVer = 0; // shift button vertical
+    const int shiftButHor = -80; // shift button horizonal
 
     sf::Texture textureBackground, logoTexture, titleTexture;
     sf::Sprite spriteBackground;
@@ -41,11 +42,11 @@ namespace DeadScreen
         GraVar::screen.draw(title);
 
         // draw "high score" button
-        GraVar::screen.draw(highScore.getSprite(GraVar::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + highScore.getH() / 2 + shilfButHor));
+        GraVar::screen.draw(highScore.getSprite(GraVar::WIDTH / 2 - highScore.getW() / 2 + shiftButVer,
+                                                GraVar::HEIGHT / 2 + highScore.getH() / 2 + shiftButHor));
         // draw "go back" button
-        GraVar::screen.draw(goback.getSprite(GraVar::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + 2 * goback.getH() + shilfButHor));
+        GraVar::screen.draw(goback.getSprite(GraVar::WIDTH / 2 - goback.getW() / 2 + shiftButVer,
+                                                GraVar::HEIGHT / 2 + 2 * goback.getH() + shiftButHor));
     }
     
     void INIT()
@@ -84,6 +85,7 @@ namespace DeadScreen
     void Run()
     {
         INIT();
+
         while(GraVar::screen.isOpen())
         {
             GraVar::screen.clear(sf::Color::White);
@@ -116,8 +118,8 @@ namespace DeadScreen
 
 namespace WinningScreen
 {
-    const int shilfButVer = 0; // shilf button vertical
-    const int shilfButHor = -80; // shilf button horizonal
+    const int shiftButVer = 0; // shift button vertical
+    const int shiftButHor = -80; // shift button horizonal
 
     sf::Texture textureBackground, logoTexture, titleTexture;
     sf::Sprite spriteBackground;
@@ -133,11 +135,11 @@ namespace WinningScreen
         GraVar::screen.draw(title);
 
         // draw "high score" button
-        GraVar::screen.draw(highScore.getSprite(GraVar::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + highScore.getH() / 2 + shilfButHor));
+        GraVar::screen.draw(highScore.getSprite(GraVar::WIDTH / 2 - highScore.getW() / 2 + shiftButVer,
+                                                GraVar::HEIGHT / 2 + highScore.getH() / 2 + shiftButHor));
         // draw "go back" button
-        GraVar::screen.draw(goback.getSprite(GraVar::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + 2 * goback.getH() + shilfButHor));
+        GraVar::screen.draw(goback.getSprite(GraVar::WIDTH / 2 - goback.getW() / 2 + shiftButVer,
+                                                GraVar::HEIGHT / 2 + 2 * goback.getH() + shiftButHor));
     }
     
     void INIT()
@@ -215,8 +217,8 @@ namespace GameScreen
 
     std::vector<Button> Tab;
 
-    const int SHILF_DOWN = 50;
-    const int SHILF_RIGHT = 50;
+    const int shift_DOWN = 50;
+    const int shift_RIGHT = 50;
     const int ICON_WIDTH = 120;
     const int ICON_HEIGHT = 120;
     const float SCALE = 0.5;
@@ -317,14 +319,14 @@ namespace GameScreen
                 {
                     if(isDead && SysVar::Board[id] == SysVar::MineCell)
                         Tab[id].setStatus(1);
-                    GraVar::screen.draw(Tab[id].getSprite(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT, 
-                                                                i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN, SCALE));
+                    GraVar::screen.draw(Tab[id].getSprite(j * (1 + ICON_WIDTH * SCALE) + shift_RIGHT, 
+                                                                i * (1 + ICON_HEIGHT * SCALE) + shift_DOWN, SCALE));
                 }
 
-                verLine.setPosition(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT - 2, 
-                                    i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN - 2);
-                horLine.setPosition(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT - 2, 
-                                    i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN - 2);
+                verLine.setPosition(j * (1 + ICON_WIDTH * SCALE) + shift_RIGHT - 2, 
+                                    i * (1 + ICON_HEIGHT * SCALE) + shift_DOWN - 2);
+                horLine.setPosition(j * (1 + ICON_WIDTH * SCALE) + shift_RIGHT - 2, 
+                                    i * (1 + ICON_HEIGHT * SCALE) + shift_DOWN - 2);
 
                 if(i != 10) GraVar::screen.draw(verLine);
                 if(j != 10) GraVar::screen.draw(horLine);
@@ -355,8 +357,8 @@ namespace GameScreen
 
     bool isOpenCells(int x, int y, bool &firstTry)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+        x = (x - shift_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - shift_DOWN) / (int)(ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
@@ -399,8 +401,8 @@ namespace GameScreen
 
     bool isFlagCells(int x, int y)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+        x = (x - shift_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - shift_DOWN) / (int)(ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
@@ -436,8 +438,8 @@ namespace GameScreen
 
     bool isOpenAround(int x, int y, bool &firstTry)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+        x = (x - shift_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - shift_DOWN) / (int)(ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
@@ -527,366 +529,254 @@ namespace GameScreen
     }
 }
 
-namespace NewGameModeScreen
+void draw(Screen &scr)
 {
-    Button easy, medium, hard, custom, goback;
-    int wheel = 0;
-    sf::Texture textureBackground, logoTexture;;
-    sf::Sprite spriteBackground;
-    sf::Vector2u logoSize;
-    sf::Vector2f logoPosition;
-    sf::Sprite logo;
 
-    void INIT()
-    {
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
-        spriteBackground.setTexture(textureBackground);
-        spriteBackground.setScale(0.342f, 0.2824f);
-        logoTexture.loadFromFile("data/title/header.png");
-                
-        
-        logoSize = logoTexture.getSize();
-        logoPosition = sf::Vector2f((GraVar::WIDTH - logoSize.x) / 2.0, 120);
-
-        logo.setTexture(logoTexture);
-        logo.setPosition(logoPosition);
-
-        easy.addImage("data/button/easy.png");
-        easy.addImage("data/button/choosing_easy.png");
-        
-        medium.addImage("data/button/medium.png");
-        medium.addImage("data/button/choosing_medium.png");
-
-        hard.addImage("data/button/hard.png");
-        hard.addImage("data/button/choosing_hard.png");
-
-        custom.addImage("data/button/custom.png");
-        custom.addImage("data/button/choosing_custom.png");
-
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
-
-    }
-
-    void DrawButton(Button &a, Button &b, Button &c)
-    {
-        const int shilfButVer = 0; // shilf button vertical
-        const int shilfButHor = 150; // shilf button horizonal
-        
-        GraVar::screen.draw(a.getSprite(GraVar::WIDTH / 2 - a.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 - 2 * a.getH() + shilfButHor));
-
-        GraVar::screen.draw(b.getSprite(GraVar::WIDTH / 2 - b.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 - b.getH() / 2 + shilfButHor));
-
-        GraVar::screen.draw(c.getSprite(GraVar::WIDTH / 2 - c.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + c.getH() + shilfButHor));
-    }
-
-    void draw()
-    {
-
-        // draw background
-        GraVar::screen.draw(spriteBackground);
-
+    int n = scr.buttonsSize();
     
-        //draw button
-        GraVar::screen.draw(logo);
+    GraVar::screen.draw(scr.getBackground());
+    GraVar::screen.draw(scr.getTitle());
 
+    for(int i = 0; i < n; i++)
+        if(scr.isVisible(i))
+            GraVar::screen.draw(scr.getButton(i));
 
-        //draw button
-        if(wheel == 0)
-            DrawButton(easy, medium, hard);
-        if(wheel == 1)
-            DrawButton(medium, hard, custom);
-        if(wheel == 2)
-            DrawButton(hard, custom, goback);
-    }
+    GraVar::screen.display();
+}
 
-    void mouseChangeStatus(int x, int y)
+void newGameChangeButton(Screen &scr)
+{
+
+    const int shiftDown = 150;
+    const int shiftRight = 0;
+    if(scr.getScrolls() == 0)
     {
-        easy.isMouseInside(x, y);
-        medium.isMouseInside(x, y);
-        hard.isMouseInside(x, y);
-        custom.isMouseInside(x, y);
-        goback.isMouseInside(x, y);
-    }
-    
-    void ClearStatus()
-    {
-        easy.setStatus(0);
-        medium.setStatus(0);
-        hard.setStatus(0);
-        custom.setStatus(0);
-        goback.setStatus(0);
-    }
-    
-    void Run()
-    {
-        INIT();
-        while(GraVar::screen.isOpen())
-        {
-            GraVar::screen.clear(sf::Color::White);
-            draw();
-            GraVar::screen.display();
+        int i = 0;
+        scr.setButtonPos(i, GraVar::WIDTH / 2 - scr.ButtonW(i) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 - scr.ButtonH(i) * 2 + shiftDown);
+        scr.setVisible(i, true);
+        scr.setButtonPos(i + 1, GraVar::WIDTH / 2 - scr.ButtonW(i + 1) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 - scr.ButtonH(i + 1) / 2 + shiftDown);
+        scr.setVisible(i + 1, true);
+        scr.setButtonPos(i + 2, GraVar::WIDTH / 2 - scr.ButtonW(i + 2) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 + scr.ButtonH(i + 2) + shiftDown);
+        scr.setVisible(i + 2, true);
 
-            sf::Event e;
-            while(GraVar::screen.pollEvent(e))
-            {
-                switch(e.type)
-                {
-                    case sf::Event::Closed:
-                        GraVar::screen.close();
-                        break;
-                    case sf::Event::MouseMoved:
-                        mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
-                        break;
-                    case sf::Event::MouseButtonPressed:
-                        
-                        if(easy.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel == 0)
-                        {
-                            easy.setStatus(0);
-                            GameScreen::Run(10, 10, 16);
-                            return ;
-                        }
-                        if(medium.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel != 2)
-                        {
-                            medium.setStatus(0);
-                            GameScreen::Run(16, 16, 64);
-                            return ;
-                        }
-                        if(hard.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel != 1)
-                        {
-                            hard.setStatus(0);
-                            GameScreen::Run(32, 32, 256);
-                            return ;
-                        }
-                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel == 2)
-                        {   
-                            goback.setStatus(0);
-                            return ;
-                        }
-                        break;
-                    case sf::Event::MouseWheelScrolled:
-                        if(e.mouseWheelScroll.delta > 0 && wheel > 0)
-                        {
-                            ClearStatus();
-                            wheel = (wheel - 1);
-                        }
-                        if(e.mouseWheelScroll.delta < 0 && wheel < 2)
-                        {
-                            ClearStatus();      
-                            wheel = (wheel + 1);
-                        }
-                        break;
-                }
-            }
-        }
+        scr.setVisible(i + 3, false);
+        scr.setVisible(i + 4, false);
+    }
+    if(scr.getScrolls() == 1)
+    {
+        int i = 1;
+        scr.setButtonPos(i, GraVar::WIDTH / 2 - scr.ButtonW(i) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 - scr.ButtonH(i) * 2 + shiftDown);
+        scr.setVisible(i, true);
+        scr.setButtonPos(i + 1, GraVar::WIDTH / 2 - scr.ButtonW(i + 1) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 - scr.ButtonH(i + 1) / 2 + shiftDown);
+        scr.setVisible(i + 1, true);
+        scr.setButtonPos(i + 2, GraVar::WIDTH / 2 - scr.ButtonW(i + 2) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 + scr.ButtonH(i + 2) + shiftDown);
+        scr.setVisible(i + 2, true);
+
+        scr.setVisible(i + 3, false);
+        scr.setVisible(i - 1, false);
+    }
+    if(scr.getScrolls() == 2)
+    {
+        int i = 2;
+        scr.setButtonPos(i, GraVar::WIDTH / 2 - scr.ButtonW(i) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 - scr.ButtonH(i) * 2 + shiftDown);
+        scr.setVisible(i, true);
+        scr.setButtonPos(i + 1, GraVar::WIDTH / 2 - scr.ButtonW(i + 1) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 - scr.ButtonH(i + 1) / 2 + shiftDown);
+        scr.setVisible(i + 1, true);
+        scr.setButtonPos(i + 2, GraVar::WIDTH / 2 - scr.ButtonW(i + 2) / 2 + shiftRight,
+                    GraVar::HEIGHT / 2 + scr.ButtonH(i + 2) + shiftDown);
+        scr.setVisible(i + 2, true);
+
+        scr.setVisible(i - 1, false);
+        scr.setVisible(i - 2, false);
     }
 }
 
-namespace ChooseGameDataSreen
+Screen NewGame(int id)
 {
-    Button newGame, _continue, goback;
-    sf::Texture textureBackground, logoTexture;
-    sf::Sprite spriteBackground, logo;
-    sf::Vector2u logoSize;
-    sf::Vector2f logoPosition;
-    void INIT()
-    {
-        ;
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
-        spriteBackground.setTexture(textureBackground);
-        spriteBackground.setScale(0.342f, 0.2824f);
+    Screen s;
+    s.setMaxScrolls(2);
+    s.setID(id);
 
-        logoTexture.loadFromFile("data/title/header.png");
-        logoSize = logoTexture.getSize();
+    // background
+    s.addBackground("data/background/ocean/choosingscreen.jpg");
 
-        logoPosition = sf::Vector2f((GraVar::WIDTH - logoSize.x) / 2.0, 120);
+    // title
+    s.addTitle("data/title/header.png");  
 
-        logo.setTexture(logoTexture);
-        logo.setPosition(logoPosition);
+    const int shiftDown = 150;
+    const int shiftRight = 0;
 
-        newGame.addImage("data/button/newgame.png");
-        newGame.addImage("data/button/choosing_newgame.png");
+    // easy button
+    s.addButton("data/button/easy.png");
+    s.addButtonTexture("data/button/choosing_easy.png", 0);
+    s.setButtonPos(0, GraVar::WIDTH / 2 - s.ButtonW(0) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 - s.ButtonH(0) * 2 + shiftDown);
 
-        _continue.addImage("data/button/continue.png");
-        _continue.addImage("data/button/choosing_continue.png");
+    // medium button
+    s.addButton("data/button/medium.png");
+    s.addButtonTexture("data/button/choosing_medium.png", 1);
+    s.setButtonPos(1, GraVar::WIDTH / 2 - s.ButtonW(1) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 - s.ButtonH(1) / 2 + shiftDown);
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
-    }
+    // hard button
+    s.addButton("data/button/hard.png");
+    s.addButtonTexture("data/button/choosing_hard.png", 2);
+    s.setButtonPos(2, GraVar::WIDTH / 2 - s.ButtonW(2) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 + s.ButtonH(2) + shiftDown);
+    
+    // custom button
+    s.addButton("data/button/custom.png");
+    s.addButtonTexture("data/button/choosing_custom.png", 3);
+    s.setVisible(3, false);
 
-    void draw()
-    {
-        // draw background
-        GraVar::screen.draw(spriteBackground);
 
-        //draw "logo"
-        GraVar::screen.draw(logo);
-
-        const int shilfButVer = 0; // shilf button vertical
-        const int shilfButHor = 150; // shilf button horizonal
-
-        //draw "new game" button
-        GraVar::screen.draw(newGame.getSprite(GraVar::WIDTH / 2 - newGame.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 - 2 * newGame.getH() + shilfButHor));
-        
-
-        // draw "continue" button
-        GraVar::screen.draw(_continue.getSprite(GraVar::WIDTH / 2 - _continue.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 - _continue.getH() / 2 + shilfButHor));
-        
-        // draw "go back" button
-        GraVar::screen.draw(goback.getSprite(GraVar::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + goback.getH() + shilfButHor));
-    }
-    bool mouseChangeStatus(int x, int y)
-    {
-        newGame.isMouseInside(x, y);
-        _continue.isMouseInside(x, y);
-        goback.isMouseInside(x, y);
-    }
-    void Run()
-    {
-        INIT();
-        while(GraVar::screen.isOpen())
-        {
-            GraVar::screen.clear(sf::Color::White);
-            draw();
-            GraVar::screen.display();
-
-            sf::Event e;
-            while(GraVar::screen.pollEvent(e))
-            {
-                switch(e.type)
-                {
-                    case sf::Event::Closed:
-                        GraVar::screen.close();
-                        break;
-                    case sf::Event::MouseMoved:
-                        mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
-                        break;
-                    case sf::Event::MouseButtonPressed:
-                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
-                        {
-                            goback.setStatus(0);
-                            return ;
-                        }
-                        if(newGame.isMouseInside(e.mouseButton.x, e.mouseButton.y))
-                        {
-                            newGame.setStatus(0);
-                            NewGameModeScreen::Run();
-                        }
-                        break;
-                }
-            }
-        }
-    }
+    // go back button
+    s.addButton("data/button/goback.png");
+    s.addButtonTexture("data/button/choosing_goback.png", 4);
+    s.setVisible(4, false);
+    
+    return s;   
 }
 
-namespace StartingScreen
+Screen Choosing(int id)
+{   
+    Screen s;
+    s.setID(id);
+    s.setMaxScrolls(0);
+
+    // background
+    s.addBackground("data/background/ocean/choosingscreen.jpg");
+
+    // title
+    s.addTitle("data/title/header.png");
+
+    const int shiftDown = 150;
+    const int shiftRight = 0;
+
+    // "newgame" button
+    s.addButton("data/button/newgame.png");
+    s.addButtonTexture("data/button/choosing_newgame.png", 0);
+    s.setButtonPos(0, GraVar::WIDTH / 2 - s.ButtonW(0) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 - s.ButtonH(0) * 2 + shiftDown);
+    s.setButtonScreenID(0, 2); // point to new-game screen
+
+
+    // "continue" button
+    s.addButton("data/button/continue.png");
+    s.addButtonTexture("data/button/choosing_continue.png", 1);
+    s.setButtonPos(1, GraVar::WIDTH / 2 - s.ButtonW(1) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 - s.ButtonH(1) / 2 + shiftDown);
+    s.setButtonScreenID(1, 5);
+
+
+    // "go back" button
+    s.addButton("data/button/goback.png");
+    s.addButtonTexture("data/button/choosing_goback.png", 2);
+    s.setButtonPos(2, GraVar::WIDTH / 2 - s.ButtonW(2) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 + s.ButtonH(2) + shiftDown);
+    s.setButtonScreenID(2, 0);
+    return s;
+}
+
+Screen Starting(int id)
 {
-    Button play, tutorial, highScore;
-    sf::Texture logoTexture, textureBackground;
-    sf::Vector2u logoSize;
-    sf::Vector2f logoPosition;
-    sf::Sprite logo, spriteBackground;
+    Screen s;
 
-    const int shilfButVer = 0; // shilf button vertical
-    const int shilfButHor = 150; // shilf button horizonal
+    s.setID(id);
+    s.setMaxScrolls(0);
 
-    void INIT()
-    {
-    
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
-        spriteBackground.setTexture(textureBackground);
-        spriteBackground.setScale(0.342f, 0.2824f);
-        
+    // background
+    s.addBackground("data/background/ocean/startingscreen.jpg");
 
-        logoTexture.loadFromFile("data/title/header.png");
-        logoSize = logoTexture.getSize();
-        logoPosition = sf::Vector2f((GraVar::WIDTH - logoSize.x) / 2.0, 120);
-        logo.setTexture(logoTexture);
-        logo.setPosition(logoPosition);
+    // title
+    s.addTitle("data/title/header.png");
+
+    const int shiftDown = 150;
+    const int shiftRight = 0;
+
+    // "play" button
+    s.addButton("data/button/play.png");
+    s.addButtonTexture("data/button/choosing_play.png", 0);
+    s.setButtonPos(0, GraVar::WIDTH / 2 - s.ButtonW(0) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 - s.ButtonH(0) * 2 + shiftDown);
+    s.setButtonScreenID(0, 1);
 
 
-        play.addImage("data/button/play.png");
-        play.addImage("data/button/choosing_play.png");
+    // "tutorial" button
+    s.addButton("data/button/tutorial.png");
+    s.addButtonTexture("data/button/choosing_tutorial.png", 1);
+    s.setButtonPos(1, GraVar::WIDTH / 2 - s.ButtonW(1) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 - s.ButtonH(1) / 2 + shiftDown);
+    s.setButtonScreenID(1, 5);
 
-        tutorial.addImage("data/button/tutorial.png");
-        tutorial.addImage("data/button/choosing_tutorial.png");
 
-        highScore.addImage("data/button/high_score.png");
-        highScore.addImage("data/button/choosing_high_score.png");
-    }
+    // "high score" button
+    s.addButton("data/button/high_score.png");
+    s.addButtonTexture("data/button/choosing_high_score.png", 2);
+    s.setButtonPos(2, GraVar::WIDTH / 2 - s.ButtonW(2) / 2 + shiftRight,
+                      GraVar::HEIGHT / 2 + s.ButtonH(2) + shiftDown);
+    s.setButtonScreenID(2, 6);
 
-    void Draw()
-    {
-        // draw background picture
-        GraVar::screen.draw(spriteBackground);
-
-        //draw "logo"
-
-        GraVar::screen.draw(logo);
-
-        // draw "play" button
-        GraVar::screen.draw(play.getSprite(GraVar::WIDTH / 2 - play.getW() / 2 + shilfButVer, 
-                                                GraVar::HEIGHT / 2 - 2 * play.getH() + shilfButHor));
-        
-        // draw "tutorial" button
-        GraVar::screen.draw(tutorial.getSprite(GraVar::WIDTH / 2 - tutorial.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 - tutorial.getH() / 2 + shilfButHor));
-        
-        // draw "high score" button
-        GraVar::screen.draw(highScore.getSprite(GraVar::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
-                                                GraVar::HEIGHT / 2 + highScore.getH() + shilfButHor));
-        
-    }
-
-    void mouseChangeStatus(int x, int y)
-    {
-        play.isMouseInside(x, y);
-        tutorial.isMouseInside(x, y);
-        highScore.isMouseInside(x, y);
-    }
-
-    void Run()
-    {
-        INIT();
-        while(GraVar::screen.isOpen())
-        {
-            GraVar::screen.clear(sf::Color::White);    
-            Draw();
-            GraVar::screen.display();
-
-            sf::Event e;
-            while(GraVar::screen.pollEvent(e))
-            {
-                switch(e.type)
-                {
-                    case sf::Event::Closed:
-                        GraVar::screen.close();
-                        break;
-                    case sf::Event::MouseButtonPressed:
-                        if(play.isMouseInside(e.mouseButton.x, e.mouseButton.y))
-                        {
-                            play.setStatus(0);
-                            ChooseGameDataSreen::Run();
-                        }
-                        break;
-                    case sf::Event::MouseMoved:
-                        mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
-                        break;
-                }
-            }
-        }
-    }
+    return s;
 }
 
 void StartGame()
 {
     GraVar::INIT();
-    StartingScreen::Run();
+    //StartingScreen::Run();
+    
+    std::vector<Screen> scrs;
+    
+    
+    scrs.emplace_back(Starting(0));// scrs[0]: starting screen 
+
+    scrs.emplace_back(Choosing(1));// scrs[1]: choosing screen
+
+    scrs.emplace_back(NewGame(2));// scrs[2]: new-game screen
+
+    scrs.emplace_back();// scrs[3]: game screen
+    
+    scrs.emplace_back();// scrs[4]: game-end screen
+
+    scrs.emplace_back();// scrs[5]: game-tutorial screen
+
+    scrs.emplace_back();// scrs[6]: high-score screen
+
+
+    int status = 0;
+    
+    while(GraVar::screen.isOpen())
+    {
+        draw(scrs[status]);
+        sf::Event e;
+        while(GraVar::screen.pollEvent(e))
+        {
+
+            switch(e.type)
+            {
+                case sf::Event::Closed:
+                    GraVar::screen.close();
+                    break;
+                case sf::Event::MouseButtonPressed:
+                    status = scrs[status].MouseChangeScreen(e.mouseButton.x, e.mouseButton.y);
+                    break;
+                case sf::Event::MouseMoved:
+                    scrs[status].MouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
+                    break;
+                case sf::Event::MouseWheelScrolled:
+                    if(scrs[status].scrolling(e.mouseWheelScroll.delta)) newGameChangeButton(scrs[status]);
+                    break;
+            }
+        }
+    }
+
     return ;
 }

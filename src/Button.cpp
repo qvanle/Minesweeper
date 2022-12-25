@@ -1,5 +1,15 @@
 #include <Button.hpp>
 
+bool Button::isVisible()
+{
+    return !Button::invisible;
+}
+
+void Button::setVisible(bool visible)
+{
+    invisible = !visible;
+}
+
 int Button::getW()
 {
     return Button::image[Button::status].getSize().x;
@@ -18,6 +28,7 @@ Button::Button()
 Button::Button(std::string link)
 {
     Button::status = 0;
+    Button::position = sf::Vector2f(0, 0);
     sf::Texture temp;
     temp.loadFromFile(link);
     Button::image.push_back(temp);
@@ -25,8 +36,17 @@ Button::Button(std::string link)
 
 sf::Sprite Button::getSprite()
 {
-    Button::position = sf::Vector2f(0, 0);
-    return sf::Sprite(Button::image[Button::status]);
+    sf::Sprite temp(Button::image[Button::status]);
+    temp.setPosition(Button::position);
+    return temp;
+}
+
+sf::Sprite Button::getSprite(float c)
+{
+    sf::Sprite temp(Button::image[Button::status]);
+    temp.setPosition(Button::position.x, Button::position.y);
+    temp.scale(c, c);
+    return temp;
 }
 
 sf::Sprite Button::getSprite(float x, float y)
@@ -78,4 +98,19 @@ void Button::setStatus(int value)
 int Button::getStatus()
 {
     return Button::status;
+}
+
+void Button::setPosition(float x, float y)
+{
+    Button::position = sf::Vector2f(x, y);
+}
+
+void Button::setScreenID(int i)
+{
+    Button::ScreenID = i;
+}
+
+int Button::getScreenID()
+{
+    return Button::ScreenID;
 }
