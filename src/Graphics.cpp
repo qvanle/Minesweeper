@@ -245,7 +245,7 @@ namespace GameScreen
         flags = 0;
 
         BoardData::init(n, m, k);
-        BoardData::time = sf::seconds
+        BoardData::time = sf::seconds(0);
 
         textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
         spriteBackground.setTexture(textureBackground);
@@ -262,7 +262,7 @@ namespace GameScreen
         textTime.setFont(GraphicsData::font);
         textTime.setCharacterSize(32);
         textTime.setFillColor(sf::Color::White);
-        textTime.setPosition(800, 100);
+        textTime.setPosition(900, 100);
         textTime.setString("0s");
 
         Tab.clear();
@@ -338,7 +338,7 @@ namespace GameScreen
                 if(j != 10) GraphicsData::screen.draw(horLine);
             }
         }
-        textTime.setString("Time(seconds): " + std::to_string((int)(BoardData::time.asSeconds()))); 
+        textTime.setString("Time: " + std::to_string((int)(BoardData::time.asSeconds())) + "s"); 
         
     }
 
