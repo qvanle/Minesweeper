@@ -1,9 +1,11 @@
-#include <GraphicsVariables.hpp>
+#include <Data.hpp>
+#include <Graphics.hpp>
 
 int main()
 {
 
-    StartGame();
+    Run();
+    
     return 0;
 }
 

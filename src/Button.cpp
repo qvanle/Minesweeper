@@ -1,13 +1,33 @@
 #include <Button.hpp>
 
-bool Button::isVisible()
+
+Button::Button()
 {
-    return !Button::invisible;
+    Button::status = 0;
+}
+int Button::getStatus()
+{
+    return Button::status;
+}
+Button::Button(std::string link)
+{
+    Button::status = 0;
+    sf::Texture temp;
+    temp.loadFromFile(link);
+    Button::image.push_back(temp);
 }
 
-void Button::setVisible(bool visible)
+void Button::addImage(std::string link)
 {
-    invisible = !visible;
+    sf::Texture temp;
+    temp.loadFromFile(link);
+    Button::image.push_back(temp);
+}
+
+sf::Sprite Button::getSprite()
+{
+    Button::position = sf::Vector2f(0, 0);
+    return sf::Sprite(Button::image[Button::status]);
 }
 
 int Button::getW()
@@ -18,35 +38,6 @@ int Button::getW()
 int Button::getH()
 {
     return Button::image[Button::status].getSize().y;
-}
-
-Button::Button()
-{
-    Button::status = 0;
-}
-
-Button::Button(std::string link)
-{
-    Button::status = 0;
-    Button::position = sf::Vector2f(0, 0);
-    sf::Texture temp;
-    temp.loadFromFile(link);
-    Button::image.push_back(temp);
-}
-
-sf::Sprite Button::getSprite()
-{
-    sf::Sprite temp(Button::image[Button::status]);
-    temp.setPosition(Button::position);
-    return temp;
-}
-
-sf::Sprite Button::getSprite(float c)
-{
-    sf::Sprite temp(Button::image[Button::status]);
-    temp.setPosition(Button::position.x, Button::position.y);
-    temp.scale(c, c);
-    return temp;
 }
 
 sf::Sprite Button::getSprite(float x, float y)
@@ -64,13 +55,6 @@ sf::Sprite Button::getSprite(float x, float y, float c)
     temp.setPosition(x, y);
     temp.scale(c, c);
     return temp;
-}
-
-void Button::addImage(std::string link)
-{
-    sf::Texture temp;
-    temp.loadFromFile(link);
-    Button::image.push_back(temp);
 }
 
 bool Button::isMouseInside(float x, float y)
@@ -93,24 +77,4 @@ bool Button::isMouseInside(float x, float y)
 void Button::setStatus(int value)
 {
     Button::status = value;
-}
-
-int Button::getStatus()
-{
-    return Button::status;
-}
-
-void Button::setPosition(float x, float y)
-{
-    Button::position = sf::Vector2f(x, y);
-}
-
-void Button::setScreenID(int i)
-{
-    Button::ScreenID = i;
-}
-
-int Button::getScreenID()
-{
-    return Button::ScreenID;
 }
