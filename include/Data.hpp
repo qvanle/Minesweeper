@@ -6,7 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-
+#include <fstream>
 #include <SFML/Graphics.hpp>
 
 using CellType = int;

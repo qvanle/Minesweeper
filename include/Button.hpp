@@ -20,4 +20,5 @@ public:
     bool isMouseInside(float x, float y);
     void setStatus(int value);
     int getStatus();
+    void setPosition(float x, float y);
 };

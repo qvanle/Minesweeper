@@ -4,6 +4,7 @@
 Button::Button()
 {
     Button::status = 0;
+    Button::position = sf::Vector2f(0, 0);
 }
 int Button::getStatus()
 {
@@ -26,8 +27,9 @@ void Button::addImage(std::string link)
 
 sf::Sprite Button::getSprite()
 {
-    Button::position = sf::Vector2f(0, 0);
-    return sf::Sprite(Button::image[Button::status]);
+    sf::Sprite temp(Button::image[Button::status]);
+    temp.setPosition(Button::position);
+    return temp;
 }
 
 int Button::getW()
@@ -77,4 +79,8 @@ bool Button::isMouseInside(float x, float y)
 void Button::setStatus(int value)
 {
     Button::status = value;
+}
+void Button::setPosition(float x, float y)
+{
+    Button::position = sf::Vector2f(x, y);
 }

@@ -1,4 +1,5 @@
 #include <Button.hpp>
+#include <Data.hpp>
 
 //declare variable
 
@@ -213,8 +214,11 @@ namespace GameScreen
     sf::Vector2u logoSize;
     sf::Vector2f logoPosition;
     sf::Sprite logo;
-    sf::Text textTime;
+    sf::Text textTime, textFlag, gameInfo;
     std::vector<Button> Tab;
+    Button goback;
+    sf::Vector2u choosingCell;
+
 
     const int SHILF_DOWN = 50;
     const int SHILF_RIGHT = 50;
@@ -225,6 +229,8 @@ namespace GameScreen
     int px = 0;
     int py = 0;
     bool isDead = 0;
+    bool isPlaying = false;
+    bool oldData;
     
     int cellsLeft;
     int mineLeft;
@@ -233,13 +239,73 @@ namespace GameScreen
     sf::RectangleShape horLine(sf::Vector2f(ICON_WIDTH * SCALE + 5 , 2.f));
     sf::RectangleShape verLine(sf::Vector2f(2.f, ICON_HEIGHT * SCALE + 5));
     sf::Color frameColor(60, 60, 60);
+    
+    sf::RectangleShape horLine2(sf::Vector2f(ICON_WIDTH * SCALE + 4, 3.f));
+    sf::RectangleShape verLine2(sf::Vector2f(3.f, ICON_HEIGHT * SCALE + 4));
+    sf::Color ChoosedColor(255, 64, 0);
+
+    void saving()
+    {
+        std::ofstream saving ("data/saving.txt");
+        saving << BoardData::Columns << " " << BoardData::Rows << " " << BoardData::Mines << "\n";
+        saving << cellsLeft << " " << mineLeft << " " << flags << "\n";
+        saving << BoardData::time.asSeconds() << "\n"; 
+        for(int i = 0; i < (int) BoardData::Board.size(); i++)
+            saving << BoardData::Board[i] << " " << Tab[i].getStatus() << "\n";
+        saving.close();
+    }
+
+    void INIT_GRAPHICS()
+    {
+        horLine.setFillColor(frameColor);
+        verLine.setFillColor(frameColor);
+
+        horLine2.setFillColor(ChoosedColor);
+        verLine2.setFillColor(ChoosedColor);
+
+        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        spriteBackground.setTexture(textureBackground);
+
+        logoTexture.loadFromFile("data/title/header.png");
+        logoSize = logoTexture.getSize();
+        logoPosition = sf::Vector2f((int)(GraphicsData::WIDTH - logoSize.x * 0.5) - 50, 50);
+
+        logo.setTexture(logoTexture);
+        logo.setScale(0.5, 0.5);
+        logo.setPosition(logoPosition);
+        
+
+        gameInfo.setFont(GraphicsData::font);
+        gameInfo.setCharacterSize(32);
+        gameInfo.setFillColor(sf::Color::White);
+        gameInfo.setPosition(850, 200);
+        gameInfo.setString("Size: " + std::to_string(BoardData::Columns) + "x" + std::to_string(BoardData::Rows) + "\nMines:" + std::to_string(BoardData::Mines) + " mines");
+
+
+        textTime.setFont(GraphicsData::font);
+        textTime.setCharacterSize(32);
+        textTime.setFillColor(sf::Color::White);
+        textTime.setPosition(848, 265);
+
+
+        textFlag.setFont(GraphicsData::font);
+        textFlag.setCharacterSize(32);
+        textFlag.setFillColor(sf::Color::White);
+        textFlag.setPosition(850, 295);
+
+        
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
+        goback.setPosition(GraphicsData::WIDTH - goback.getW() - 150, 500);
+
+    }
 
     void INIT(int n, int m, int k)
     {
+        oldData = false;
 
-        horLine.setFillColor(frameColor);
-        verLine.setFillColor(frameColor);
         isDead = false;
+        isPlaying = false;
         cellsLeft = n * m;
         mineLeft = k;
         flags = 0;
@@ -247,24 +313,7 @@ namespace GameScreen
         BoardData::init(n, m, k);
         BoardData::time = sf::seconds(0);
 
-        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
-        spriteBackground.setTexture(textureBackground);
-
-        logoTexture.loadFromFile("data/title/header.png");
-        logoSize = logoTexture.getSize();
-        logoPosition = sf::Vector2f((int)(GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
-
-        logo.setTexture(logoTexture);
-        logo.setScale(0.6, 0.6);
-        logo.setPosition(logoPosition);
-
-
-        textTime.setFont(GraphicsData::font);
-        textTime.setCharacterSize(32);
-        textTime.setFillColor(sf::Color::White);
-        textTime.setPosition(900, 100);
-        textTime.setString("0s");
-
+        
         Tab.clear();
         Tab.resize(n * m);
 
@@ -279,11 +328,50 @@ namespace GameScreen
                 Tab[id].addImage("data/icons/ocean/10.jpg");
             }
         }
+        INIT_GRAPHICS();
+    }
+
+    void INIT(std::string link, bool &FirstTry)
+    {
+
+        oldData = true;
+
+        std::ifstream Data(link);
+
+        isDead = false;
+        isPlaying = false;
+        
+        Data >> BoardData::Columns >> BoardData::Rows >> BoardData::Mines;
+        Data >> cellsLeft >> mineLeft >> flags;
+        float temp; Data >> temp;
+        BoardData::time = sf::seconds(temp);
+
+
+        Tab.clear();
+        Tab.resize(BoardData::Columns * BoardData::Rows);
+        BoardData::Board.resize((BoardData::Columns * BoardData::Rows));
+        for(int i = 0; i < BoardData::Rows; i++)
+        {
+            for (int j = 0; j < BoardData::Columns; j++)
+            {
+                int id = i * BoardData::Columns + j;
+                Tab[id].addImage("data/icons/ocean/12.png");
+                Tab[id].addImage("data/icons/ocean/" + std::to_string(BoardData::Board[id]) + ".jpg");
+                Tab[id].addImage("data/icons/ocean/9.jpg");
+                Tab[id].addImage("data/icons/ocean/10.jpg");
+                int temp;
+                Data >> BoardData::Board[id] >> temp;
+                Tab[id].setStatus(temp);
+                if(temp == 0) FirstTry = false;
+            }
+        }
+        INIT_GRAPHICS();
+        Data.close();
     }
 
     void INIT(int x, int y)
     {
-
+        oldData = false;
         int n = BoardData::Columns;
         int m = BoardData::Rows;
         int k = BoardData::Mines;
@@ -314,7 +402,14 @@ namespace GameScreen
     void draw()
     {
         GraphicsData::screen.draw(spriteBackground);
+        GraphicsData::screen.draw(logo);
+        textTime.setString("Time: " + std::to_string((int)(BoardData::time.asSeconds())) + "s"); 
         GraphicsData::screen.draw(textTime);
+        GraphicsData::screen.draw(gameInfo);
+        textFlag.setString("Flags: " + std::to_string(flags));
+        GraphicsData::screen.draw(textFlag);
+        GraphicsData::screen.draw(goback.getSprite());
+
         for(int i = 0; i <= 10; i++)
         {
             for(int j = 0; j <= 10; j++)
@@ -338,8 +433,37 @@ namespace GameScreen
                 if(j != 10) GraphicsData::screen.draw(horLine);
             }
         }
-        textTime.setString("Time: " + std::to_string((int)(BoardData::time.asSeconds())) + "s"); 
+
+        if(choosingCell.x != -1)
+        {
+            
+            for(int i = choosingCell.x; i <= choosingCell.x + 1; i++)
+                for(int j = choosingCell.y; j <= choosingCell.y + 1; j++)
+                {
+                    verLine2.setPosition(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT - 2, 
+                                        i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN - 2);
+                    horLine2.setPosition(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT - 2, 
+                                        i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN - 2);
+
+                    if(i != choosingCell.x + 1) GraphicsData::screen.draw(verLine2);
+                    if(j != choosingCell.y + 1) GraphicsData::screen.draw(horLine2);
+                }
+        }
         
+    }
+
+    bool isChoosingCells(int x, int y)
+    {
+        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
+        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+
+        choosingCell = sf::Vector2u(-1, -1);
+
+        if(x < 0 || x >= 10) return false;
+        if(y < 0 || y >= 10) return false;
+
+        choosingCell = sf::Vector2u(y, x);
+        return true;
     }
 
     void openCells(int x, int y)
@@ -469,17 +593,18 @@ namespace GameScreen
     void RunTheClock()
     {
         BoardData::clock.restart();
-        while(!isDead && !(cellsLeft == 0 && mineLeft == 0) && GraphicsData::screen.isOpen()) 
+        while(isPlaying) 
         {
             BoardData::time += BoardData::clock.restart();
         }
     }
 
-    void Run(int n, int m, int k)
-    {
-        INIT(n, m, k);
-        
+    void Run(int n, int m, int k, std::string link = "null")
+    {   
         bool firstTry = true;
+        if(link !="null") INIT(link, firstTry);
+        else INIT(n, m, k);
+        
 
         GraphicsData::screen.clear(sf::Color::White);
 
@@ -487,11 +612,14 @@ namespace GameScreen
         sf::Thread timing(&RunTheClock);
         timing.launch();
 
-
+        isPlaying = false;
         while (GraphicsData::screen.isOpen())
         {
+            isPlaying = true;
             if(isDead)
             {
+                if(oldData) remove("data/saving.txt");
+                isPlaying = false;
                 draw();
                 GraphicsData::screen.display();
                 delay(2000);
@@ -500,6 +628,8 @@ namespace GameScreen
             }
             if(cellsLeft == 0 && mineLeft == 0)
             {
+                if(oldData) remove("data/saving.txt");
+                isPlaying = false;
                 draw();
                 GraphicsData::screen.display();
                 delay(1000);
@@ -516,8 +646,10 @@ namespace GameScreen
                 switch(e.type)
                 {
                     case sf::Event::Closed:
+                        isPlaying = false;
+                        saving();
                         GraphicsData::screen.close();
-                        break;
+                        return ;
 
                     case sf::Event::KeyPressed:
                         if(e.key.code == sf::Keyboard::A || e.key.code == sf::Keyboard::Left)
@@ -533,7 +665,14 @@ namespace GameScreen
                     case sf::Event::MouseButtonPressed:
                         if(e.mouseButton.button == sf::Mouse::Left)
                         {
-                            isOpenCells(e.mouseButton.y, e.mouseButton.x, firstTry);
+                            if(!isOpenCells(e.mouseButton.y, e.mouseButton.x, firstTry))
+                                if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                                {   
+                                    isPlaying = false;
+                                    goback.setStatus(0);
+                                    saving();
+                                    return ;
+                                }
                         }
                         if(e.mouseButton.button == sf::Mouse::Right)
                         {
@@ -542,6 +681,12 @@ namespace GameScreen
                         if(e.mouseButton.button == sf::Mouse::Middle)
                         {
                             isOpenAround(e.mouseButton.y, e.mouseButton.x, firstTry);
+                        }
+                        break;
+                    case sf::Event::MouseMoved:
+                        if(!goback.isMouseInside(e.mouseMove.x, e.mouseMove.y))
+                        {
+                            isChoosingCells(e.mouseMove.x, e.mouseMove.y);
                         }
                         break;
                 }
@@ -738,9 +883,22 @@ namespace ChooseGameDataSreen
     sf::Sprite spriteBackground, logo;
     sf::Vector2u logoSize;
     sf::Vector2f logoPosition;
+    sf::Text noData;
+    sf::RectangleShape noDataBackground;
+
+    bool isFileExist(char *link)
+    {
+        FILE *file;
+        if (file = fopen(link, "r")) 
+        {
+            fclose(file);
+            return true;
+        }
+        return false;
+    }
+    
     void INIT()
     {
-        ;
         textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
         spriteBackground.setTexture(textureBackground);
         spriteBackground.setScale(0.342f, 0.2824f);
@@ -761,6 +919,16 @@ namespace ChooseGameDataSreen
 
         goback.addImage("data/button/goback.png");
         goback.addImage("data/button/choosing_goback.png");
+
+        noData.setFont(GraphicsData::font);
+        noData.setCharacterSize(32);
+        noData.setFillColor(sf::Color::White);
+        noData.setPosition(370, 330);
+        noData.setString("You have no recent games yet!");
+
+        noDataBackground.setSize(sf::Vector2f(600, 120));
+        noDataBackground.setFillColor(sf::Color(0, 88, 122));
+        noDataBackground.setPosition(300, 290);
     }
 
     void draw()
@@ -787,12 +955,14 @@ namespace ChooseGameDataSreen
         GraphicsData::screen.draw(goback.getSprite(GraphicsData::WIDTH / 2 - goback.getW() / 2 + shilfButVer,
                                                 GraphicsData::HEIGHT / 2 + goback.getH() + shilfButHor));
     }
+    
     bool mouseChangeStatus(int x, int y)
     {
         newGame.isMouseInside(x, y);
         _continue.isMouseInside(x, y);
         goback.isMouseInside(x, y);
     }
+    
     void Run()
     {
         INIT();
@@ -823,6 +993,22 @@ namespace ChooseGameDataSreen
                         {
                             newGame.setStatus(0);
                             NewGameModeScreen::Run();
+                        }
+                        if(_continue.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {   
+                            if(isFileExist("data/saving.txt"))
+                            {
+                                _continue.setStatus(0);
+                                GameScreen::Run(-1, -1, -1, "data/saving.txt");
+                                return ;
+                            }else
+                            {
+                                
+                                GraphicsData::screen.draw(noDataBackground);
+                                GraphicsData::screen.draw(noData);
+                                GraphicsData::screen.display();
+                                delay(1300);
+                            }
                         }
                         break;
                 }
