@@ -12,7 +12,6 @@ sf::RenderWindow GraphicsData::screen(sf::VideoMode(GraphicsData::WIDTH, Graphic
 void GraphicsData::INIT()
 {
     GraphicsData::font.loadFromFile("data/font/monofur/monof55.ttf");
-    //GraphicsData::font.loadFromFile("arial.ttf");
 }
 
 
@@ -214,14 +213,14 @@ namespace GameScreen
     sf::Vector2u logoSize;
     sf::Vector2f logoPosition;
     sf::Sprite logo;
-    sf::Text textTime, textFlag, gameInfo;
+    sf::Text textTime, textFlag, gameInfo, tutorial;
     std::vector<Button> Tab;
     Button goback;
     sf::Vector2u choosingCell;
-
+    Button leftBar, rightBar, downBar, upBar;
 
     const int SHILF_DOWN = 50;
-    const int SHILF_RIGHT = 50;
+    const int SHILF_RIGHT = 100;
     const int ICON_WIDTH = 120;
     const int ICON_HEIGHT = 120;
     const float SCALE = 0.5;
@@ -257,6 +256,7 @@ namespace GameScreen
 
     void INIT_GRAPHICS()
     {
+
         horLine.setFillColor(frameColor);
         verLine.setFillColor(frameColor);
 
@@ -274,30 +274,39 @@ namespace GameScreen
         logo.setScale(0.5, 0.5);
         logo.setPosition(logoPosition);
         
+        tutorial.setFont(GraphicsData::font);
+        tutorial.setCharacterSize(18);
+        tutorial.setFillColor(sf::Color::Green);
+        tutorial.setPosition(790, 150);
+        tutorial.setString("Use arrow key on keyboard to move the board.");
 
         gameInfo.setFont(GraphicsData::font);
         gameInfo.setCharacterSize(32);
         gameInfo.setFillColor(sf::Color::White);
-        gameInfo.setPosition(850, 200);
+        gameInfo.setPosition(850, 250);
         gameInfo.setString("Size: " + std::to_string(BoardData::Columns) + "x" + std::to_string(BoardData::Rows) + "\nMines:" + std::to_string(BoardData::Mines) + " mines");
 
 
         textTime.setFont(GraphicsData::font);
         textTime.setCharacterSize(32);
         textTime.setFillColor(sf::Color::White);
-        textTime.setPosition(848, 265);
+        textTime.setPosition(848, 315);
 
 
         textFlag.setFont(GraphicsData::font);
         textFlag.setCharacterSize(32);
         textFlag.setFillColor(sf::Color::White);
-        textFlag.setPosition(850, 295);
+        textFlag.setPosition(850, 345);
 
         
         goback.addImage("data/button/goback.png");
         goback.addImage("data/button/choosing_goback.png");
-        goback.setPosition(GraphicsData::WIDTH - goback.getW() - 150, 500);
+        goback.setPosition(GraphicsData::WIDTH - goback.getW() - 150, 550);
 
+        leftBar.addImage("data/button/left_bar.png");
+        rightBar.addImage("data/button/right_bar.png");
+        downBar.addImage("data/button/down_bar.png");
+        upBar.addImage("data/button/up_bar.png");
     }
 
     void INIT(int n, int m, int k)
@@ -402,14 +411,12 @@ namespace GameScreen
     void draw()
     {
         GraphicsData::screen.draw(spriteBackground);
-        GraphicsData::screen.draw(logo);
-        textTime.setString("Time: " + std::to_string((int)(BoardData::time.asSeconds())) + "s"); 
-        GraphicsData::screen.draw(textTime);
-        GraphicsData::screen.draw(gameInfo);
-        textFlag.setString("Flags: " + std::to_string(flags));
-        GraphicsData::screen.draw(textFlag);
-        GraphicsData::screen.draw(goback.getSprite());
 
+        if(py != 0) GraphicsData::screen.draw(leftBar.getSprite(SHILF_RIGHT - 40, SHILF_DOWN));
+        if(px != 0) GraphicsData::screen.draw(upBar.getSprite(SHILF_RIGHT, SHILF_DOWN - 40));
+        if(py + 10 < BoardData::Columns) GraphicsData::screen.draw(rightBar.getSprite(610 + SHILF_RIGHT, SHILF_DOWN));
+        if(px + 10 < BoardData::Rows) GraphicsData::screen.draw(downBar.getSprite(SHILF_RIGHT, 610 + SHILF_DOWN));
+        
         for(int i = 0; i <= 10; i++)
         {
             for(int j = 0; j <= 10; j++)
@@ -433,6 +440,14 @@ namespace GameScreen
                 if(j != 10) GraphicsData::screen.draw(horLine);
             }
         }
+        GraphicsData::screen.draw(logo);
+        if(BoardData::Columns > 10 || BoardData::Rows > 10) GraphicsData::screen.draw(tutorial);
+        textTime.setString("Time: " + std::to_string((int)(BoardData::time.asSeconds())) + "s"); 
+        GraphicsData::screen.draw(textTime);
+        GraphicsData::screen.draw(gameInfo);
+        textFlag.setString("Flags: " + std::to_string(flags));
+        GraphicsData::screen.draw(textFlag);
+        GraphicsData::screen.draw(goback.getSprite());
 
         if(choosingCell.x != -1)
         {
@@ -454,8 +469,8 @@ namespace GameScreen
 
     bool isChoosingCells(int x, int y)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+        x = (x - SHILF_RIGHT) / (int)(1 + ICON_WIDTH * SCALE);
+        y = (y - SHILF_DOWN) / (int)(1 + ICON_HEIGHT * SCALE);
 
         choosingCell = sf::Vector2u(-1, -1);
 
@@ -489,9 +504,8 @@ namespace GameScreen
 
     bool isOpenCells(int x, int y, bool &firstTry)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
-
+        y = (y - SHILF_RIGHT) / (int)(1 + ICON_WIDTH * SCALE);
+        x = (x - SHILF_DOWN) / (int)(1 + ICON_HEIGHT * SCALE);
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
         
@@ -533,8 +547,8 @@ namespace GameScreen
 
     bool isFlagCells(int x, int y)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+        y = (y - SHILF_RIGHT) / (int)(1 + ICON_WIDTH * SCALE);
+        x = (x - SHILF_DOWN) / (int)(1 + ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
@@ -570,8 +584,8 @@ namespace GameScreen
 
     bool isOpenAround(int x, int y, bool &firstTry)
     {
-        x = (x - SHILF_RIGHT) / (int)(ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(ICON_HEIGHT * SCALE);
+        x = (x - SHILF_RIGHT) / (int)(1 + ICON_WIDTH * SCALE);
+        y = (y - SHILF_DOWN) / (int)(1 + ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
@@ -626,6 +640,7 @@ namespace GameScreen
                 DeadScreen::Run();
                 return ;
             }
+            
             if(cellsLeft == 0 && mineLeft == 0)
             {
                 if(oldData) remove("data/saving.txt");
@@ -849,7 +864,6 @@ namespace NewGameModeScreen
                         if(custom.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel != 0)
                         {   
                             custom.setStatus(0);
-                            //InputBox custom(2, "Enter the size!");
                             return ;
                         }
                         if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel == 2)
@@ -999,8 +1013,9 @@ namespace ChooseGameDataSreen
                             if(isFileExist("data/saving.txt"))
                             {
                                 _continue.setStatus(0);
+                                bool temp;
+                                GameScreen::INIT("data/saving.txt", temp);
                                 GameScreen::Run(-1, -1, -1, "data/saving.txt");
-                                return ;
                             }else
                             {
                                 
