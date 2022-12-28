@@ -1,4 +1,5 @@
 #include <Button.hpp>
+#include <InputBox.hpp>
 #include <Data.hpp>
 
 //declare variable
@@ -22,6 +23,163 @@ void delay(int t)
     while(clock.getElapsedTime() - start < sf::milliseconds(t));
     return ;
 }   
+namespace HighScoresScreen
+{
+    sf::Texture textureBackground, logoTexture;
+    sf::Sprite spriteBackground;
+    sf::Vector2u logoSize;
+    sf::Vector2f logoPosition;
+    sf::Sprite logo;
+    sf::RectangleShape board;
+    Button goback;
+    std::vector<sf::Text> texts[4];
+    sf::Text title;
+    std::vector< std::array<float, 4> > scores;
+    int px;
+    int status;
+
+    bool cmp(std::array<float, 4> a, std::array<float, 4> b)
+    {
+        return (double) a[0] / a[3] / a[3] * a[1] * a[2] > (double) a[0] / a[3] * a[1] / a[3] * a[2];
+    }
+    void INIT()
+    {
+
+        texts[0].clear();
+        texts[1].clear();
+        texts[2].clear();
+        texts[3].clear();
+
+        scores.clear();
+
+        textureBackground.loadFromFile("data/background/ocean/sunset.jpg");   
+        spriteBackground.setTexture(textureBackground);
+
+
+        logoTexture.loadFromFile("data/title/header.png");
+        logoSize = logoTexture.getSize();
+        logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 100);
+        logo.setScale(0.6f, 0.6f);
+        logo.setTexture(logoTexture);
+        logo.setPosition(logoPosition);
+
+
+        board.setSize(sf::Vector2f(600, 600));
+        board.setPosition(50, 50);
+        board.setFillColor(sf::Color(64, 64, 200));
+
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
+        goback.setPosition(GraphicsData::WIDTH - goback.getW() - 160, 280);
+
+        title.setString("HIGH SCORE");
+        title.setFont(GraphicsData::font);
+        title.setCharacterSize(64);
+        title.setFillColor(sf::Color::White);
+        title.setPosition(190, 50);
+        
+        px = 0;
+        status = 0;
+
+        std::ifstream getData("data/.highscores");
+        std::array<float, 4> temp;
+        while(getData >> temp[0] >> temp[1] >> temp[2] >> temp[3])
+        {   
+            scores.push_back(temp);
+        }
+        getData.close();
+        
+        std::sort(scores.begin(), scores.end(), cmp);
+        for(int i = 0; i < (int)scores.size(); i++)
+        {
+            for(int j = 0; j < 4; j++)
+            {
+                texts[j].emplace_back();
+                texts[j].back().setFont(GraphicsData::font);
+                texts[j].back().setCharacterSize(24);
+                texts[j].back().setFillColor(sf::Color::White);
+            }
+            int y = 150 + 30 * i;
+            texts[0].back().setString(std::to_string(i + 1));
+            texts[0].back().setPosition(80, y);
+
+            texts[1].back().setString(std::to_string((int)scores[i][0]) + "x" + std::to_string((int)scores[i][1]));
+            texts[1].back().setPosition(200, y);
+
+            texts[2].back().setString(std::to_string((int)scores[i][2]));
+            texts[2].back().setPosition(350, y);
+
+            texts[3].back().setString(std::to_string(scores[i][3]));
+            texts[3].back().setPosition(500, y);
+        }
+        
+    }
+    void draw()
+    {
+        GraphicsData::screen.draw(spriteBackground);
+        GraphicsData::screen.draw(logo);
+        GraphicsData::screen.draw(board);
+        GraphicsData::screen.draw(goback.getSprite());
+        GraphicsData::screen.draw(title);
+        for(int i = px; i < px + 16 && i < (int) texts[0].size(); i++)
+        {
+            GraphicsData::screen.draw(texts[0][i]);
+            GraphicsData::screen.draw(texts[1][i]);
+            GraphicsData::screen.draw(texts[2][i]);
+            GraphicsData::screen.draw(texts[3][i]);
+        }
+    }
+    void Scrolling(int delta)
+    {
+        if(delta > 0 && px != 0) px--;
+        if(delta < 0 && px + 16 != (int) scores.size()) px++;
+        for(int i = px; i < px + 16; i++)
+        {
+            int y = 150 + 30 * (i - px);
+            texts[0][i].setPosition(80, y);
+
+            texts[1][i].setPosition(200, y);
+
+            texts[2][i].setPosition(350, y);
+
+            texts[3][i].setPosition(500, y);
+
+        }
+    }
+    void Run()
+    {
+        INIT();
+
+        while(GraphicsData::screen.isOpen())
+        {
+            draw();
+            GraphicsData::screen.display();
+
+            sf::Event e;
+            while(GraphicsData::screen.pollEvent(e))
+            {
+                switch(e.type)
+                {
+                    case sf::Event::Closed:
+                        GraphicsData::screen.close();
+                        break;
+                    case sf::Event::MouseButtonPressed:
+                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            goback.setStatus(0);
+                            return ;
+                        }
+                        break;
+                    case sf::Event::MouseMoved:
+                        goback.isMouseInside(e.mouseMove.x, e.mouseMove.y);
+                        break;
+                    case sf::Event::MouseWheelScrolled:
+                        Scrolling(e.mouseWheelScroll.delta);
+                }
+            }
+        }
+    }
+}
 
 namespace DeadScreen
 {
@@ -105,6 +263,13 @@ namespace DeadScreen
                             goback.setStatus(0);
                             return ; 
                         }
+
+                        if(highScore.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            highScore.setStatus(0);
+                            HighScoresScreen::Run();
+                            return ;
+                        }
                         break;
                     case sf::Event::MouseMoved:
                         mouseChangeStatus(e.mouseMove.x, e.mouseMove.y);
@@ -174,12 +339,15 @@ namespace WinningScreen
         highScore.isMouseInside(x, y);
     }
 
-    void Run()
+    void Run(float result, int n, int m, int k)
     {
+        std::ofstream honors;
+        honors.open("data/.highscores", std::ios_base::app);
+        honors << n << " " << m << " " << k << " " << result << "\n";
+        honors.close();
         INIT();
         while(GraphicsData::screen.isOpen())
         {
-            GraphicsData::screen.clear(sf::Color::White);
             draw();
             GraphicsData::screen.display();
 
@@ -196,6 +364,12 @@ namespace WinningScreen
                         {
                             goback.setStatus(0);
                             return ; 
+                        }
+                        if(highScore.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            highScore.setStatus(0);
+                            HighScoresScreen::Run();
+                            return ;
                         }
                         break;
                     case sf::Event::MouseMoved:
@@ -499,6 +673,11 @@ namespace GameScreen
         openCells(x + 1, y);
         openCells(x, y - 1);
         openCells(x, y + 1); 
+
+        openCells(x + 1, y + 1);
+        openCells(x - 1, y + 1);
+        openCells(x + 1, y - 1);
+        openCells(x - 1, y - 1);
         return ;
     }
 
@@ -584,8 +763,8 @@ namespace GameScreen
 
     bool isOpenAround(int x, int y, bool &firstTry)
     {
-        x = (x - SHILF_RIGHT) / (int)(1 + ICON_WIDTH * SCALE);
-        y = (y - SHILF_DOWN) / (int)(1 + ICON_HEIGHT * SCALE);
+        y = (y - SHILF_RIGHT) / (int)(1 + ICON_WIDTH * SCALE);
+        x = (x - SHILF_DOWN) / (int)(1 + ICON_HEIGHT * SCALE);
 
         if(x < 0 || x >= 10) return false;
         if(y < 0 || y >= 10) return false;
@@ -648,7 +827,7 @@ namespace GameScreen
                 draw();
                 GraphicsData::screen.display();
                 delay(1000);
-                WinningScreen::Run();
+                WinningScreen::Run(BoardData::time.asSeconds(), BoardData::Rows, BoardData::Columns, BoardData::Mines);
                 return ;
             }
 
@@ -821,6 +1000,99 @@ namespace NewGameModeScreen
         goback.setStatus(0);
     }
     
+    void TextBox(int &n ,int &m, int &k)
+    {
+        n = 10;
+        m = 10;
+        k = 16;
+        sf::RectangleShape background;
+
+        background.setSize(sf::Vector2f(800, 300));
+        background.setFillColor(sf::Color(0, 64, 128));
+        background.setPosition((1200-800) / 2, (700 - 400) / 2 + 100);
+
+        InputBox cols, rows, mines;
+        Button play;
+
+        cols.setPosition(260, 300);
+        cols.setTitle("Enter number of columns:\nMinimum is 10, maximum is 100");
+
+        rows.setPosition(260, 400);
+        rows.setTitle("Enter number of rows:\nMinimum is 10, maximum is 100");
+
+        mines.setPosition(260, 500);
+        mines.setTitle("Enter number of mines:");
+        
+        play.addImage("data/button/play.png");
+        play.addImage("data/button/choosing_play.png");
+        
+        while(true)
+        {
+            GraphicsData::screen.draw(background);
+            GraphicsData::screen.draw(cols.getBackground());
+            GraphicsData::screen.draw(cols.getTitle());
+            GraphicsData::screen.draw(cols.getNum());
+
+            GraphicsData::screen.draw(rows.getBackground());
+            GraphicsData::screen.draw(rows.getTitle());
+            GraphicsData::screen.draw(rows.getNum());
+
+            GraphicsData::screen.draw(mines.getBackground());
+            GraphicsData::screen.draw(mines.getTitle());
+            GraphicsData::screen.draw(mines.getNum());
+
+            GraphicsData::screen.draw(play.getSprite(480, 560));
+
+            GraphicsData::screen.display();
+            sf::Event e;
+            while(GraphicsData::screen.pollEvent(e))
+            {
+                switch(e.type)
+                {
+                    case sf::Event::Closed:
+                        GraphicsData::screen.close();
+                        return ;
+                    case sf::Event::MouseButtonPressed:
+                        if(cols.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                            cols.setFocus(true);
+                        else 
+                            cols.setFocus(false);
+                        if(rows.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                            rows.setFocus(true);
+                        else 
+                            rows.setFocus(false);
+                        if(mines.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                            mines.setFocus(true);
+                        else 
+                            mines.setFocus(false);
+                        if(play.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            play.setStatus(0);
+                            n = rows.getValue();
+                            m = cols.getValue();
+                            k = mines.getValue();
+                            if(n <= 0) n = 10;
+                            if(m <= 0) m = 10;
+                            if(k < 0) k = 0;
+                            if(k > n * m) k = n * m;
+                            return ;
+                        }
+                        break;
+                    case sf::Event::MouseMoved:
+                        play.isMouseInside(e.mouseMove.x, e.mouseMove.y);
+                        break;
+                    case sf::Event::KeyPressed:
+
+                        rows.typing(e.key.code);
+                        cols.typing(e.key.code);
+                        mines.typing(e.key.code);
+                        break;
+                }
+            }
+        }
+
+    }
+
     void Run()
     {
         INIT();
@@ -864,6 +1136,9 @@ namespace NewGameModeScreen
                         if(custom.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel != 0)
                         {   
                             custom.setStatus(0);
+                            int n, m, k;
+                            TextBox(n, m, k);
+                            GameScreen::Run(n, m, k);
                             return ;
                         }
                         if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y) && wheel == 2)
@@ -1103,7 +1378,6 @@ namespace StartingScreen
         INIT();
         while(GraphicsData::screen.isOpen())
         {
-            GraphicsData::screen.clear(sf::Color::White);    
             Draw();
             GraphicsData::screen.display();
 
@@ -1120,6 +1394,11 @@ namespace StartingScreen
                         {
                             play.setStatus(0);
                             ChooseGameDataSreen::Run();
+                        }
+                        if(highScore.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            highScore.setStatus(0);
+                            HighScoresScreen::Run();
                         }
                         break;
                     case sf::Event::MouseMoved:

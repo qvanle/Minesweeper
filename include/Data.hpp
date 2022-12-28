@@ -8,7 +8,7 @@
 #include <string>
 #include <fstream>
 #include <SFML/Graphics.hpp>
-
+#include <SFML/Window.hpp>
 using CellType = int;
 using Cell = std::array<int, 2>;
 

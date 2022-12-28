@@ -1,4 +1,4 @@
-INCLUDE_PATH :=/home/qvanle/College/CS161/Minesweeper/include
+INCLUDE_PATH :=/home/qvanle/university/CS161/Minesweeper/include
 
 QuickBuild:
 	clear
