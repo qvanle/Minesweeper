@@ -1,0 +1,10 @@
+author: 22125119-Le Quoc Van
+respository: https://github.com/qvanle/Minesweeper
+
+Requirements:
+	C++17
+	sfml 2.5.1
+	makefile
+
+Features:
+	

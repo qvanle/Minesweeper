@@ -23,6 +23,99 @@ void delay(int t)
     while(clock.getElapsedTime() - start < sf::milliseconds(t));
     return ;
 }   
+
+namespace TutorialScreen
+{
+    sf::Texture textureBackground, logoTexture;
+    sf::Sprite spriteBackground;
+    sf::Vector2u logoSize;
+    sf::Vector2f logoPosition;
+    sf::Sprite logo;
+    sf::RectangleShape board;
+    Button goback;
+    sf::Text content;
+
+    void INIT()
+    {
+        textureBackground.loadFromFile("data/background/ocean/sunset.jpg");   
+        spriteBackground.setTexture(textureBackground);
+
+
+        logoTexture.loadFromFile("data/title/header.png");
+        logoSize = logoTexture.getSize();
+        logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 100);
+        logo.setScale(0.6f, 0.6f);
+        logo.setTexture(logoTexture);
+        logo.setPosition(logoPosition);
+
+
+        board.setSize(sf::Vector2f(600, 600));
+        board.setPosition(50, 50);
+        board.setFillColor(sf::Color(64, 64, 200));
+
+        goback.addImage("data/button/goback.png");
+        goback.addImage("data/button/choosing_goback.png");
+        goback.setPosition(GraphicsData::WIDTH - goback.getW() - 160, 280);
+
+        content.setString("\t\t  WELLCOME TO MY FIRST GAME\n\n"
+        "This is the tutorial to play this game.\n"
+        "-------------------------------------------------\n\n"
+        "To open a cell, left click to that cell.\n\n"
+        "I you not sure a cell is a mine, right click two \ntime and the cell'll become suspected cell.\n\n"
+        "If you think a cell is a mine, right click to \nthat cell and the cell will be marked.\n\n"
+        "To return a cell to its initial state, right\n-click it until it works.\n\n"
+        "If the board are to big, use arrow button on\nkeyboard to move the board display.\n\n"
+        "\n\n\n\n"
+        "\t\t\t\t\t\t  Becareful and have fun!\n\n"
+        );
+        content.setFont(GraphicsData::font);
+        content.setCharacterSize(24);
+        content.setFillColor(sf::Color::White);
+        content.setPosition(60, 60);
+    }
+
+    void draw()
+    {
+        GraphicsData::screen.draw(spriteBackground);
+        GraphicsData::screen.draw(logo);
+        GraphicsData::screen.draw(board);
+        GraphicsData::screen.draw(goback.getSprite());
+        GraphicsData::screen.draw(content);
+    }
+
+    void Run()
+    {
+        INIT();
+
+        while(GraphicsData::screen.isOpen())
+        {
+            draw();
+            GraphicsData::screen.display();
+
+            sf::Event e;
+            while(GraphicsData::screen.pollEvent(e))
+            {
+                switch(e.type)
+                {
+                    case sf::Event::Closed:
+                        GraphicsData::screen.close();
+                        break;
+                    case sf::Event::MouseButtonPressed:
+                        if(goback.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            goback.setStatus(0);
+                            return ;
+                        }
+                        break;
+                    case sf::Event::MouseMoved:
+                        goback.isMouseInside(e.mouseMove.x, e.mouseMove.y);
+                        break;
+                }
+            }
+        }
+    }
+}
+
 namespace HighScoresScreen
 {
     sf::Texture textureBackground, logoTexture;
@@ -114,6 +207,7 @@ namespace HighScoresScreen
         }
         
     }
+    
     void draw()
     {
         GraphicsData::screen.draw(spriteBackground);
@@ -129,6 +223,7 @@ namespace HighScoresScreen
             GraphicsData::screen.draw(texts[3][i]);
         }
     }
+    
     void Scrolling(int delta)
     {
         if(delta > 0 && px != 0) px--;
@@ -1015,10 +1110,10 @@ namespace NewGameModeScreen
         Button play;
 
         cols.setPosition(260, 300);
-        cols.setTitle("Enter number of columns:\nMinimum is 10, maximum is 100");
+        cols.setTitle("Enter number of columns:\nMinimum is 10, maximum is 32");
 
         rows.setPosition(260, 400);
-        rows.setTitle("Enter number of rows:\nMinimum is 10, maximum is 100");
+        rows.setTitle("Enter number of rows:\nMinimum is 10, maximum is 32");
 
         mines.setPosition(260, 500);
         mines.setTitle("Enter number of mines:");
@@ -1045,6 +1140,9 @@ namespace NewGameModeScreen
 
             GraphicsData::screen.display();
             sf::Event e;
+            cols.setRange(10, 32);
+            rows.setRange(10, 32);
+
             while(GraphicsData::screen.pollEvent(e))
             {
                 switch(e.type)
@@ -1056,11 +1154,11 @@ namespace NewGameModeScreen
                         if(cols.isMouseInside(e.mouseButton.x, e.mouseButton.y))
                             cols.setFocus(true);
                         else 
-                            cols.setFocus(false);
+                            cols.setFocus(false), cols.setRange(10, 32);
                         if(rows.isMouseInside(e.mouseButton.x, e.mouseButton.y))
                             rows.setFocus(true);
                         else 
-                            rows.setFocus(false);
+                            rows.setFocus(false), rows.setRange(10, 32);
                         if(mines.isMouseInside(e.mouseButton.x, e.mouseButton.y))
                             mines.setFocus(true);
                         else 
@@ -1399,6 +1497,11 @@ namespace StartingScreen
                         {
                             highScore.setStatus(0);
                             HighScoresScreen::Run();
+                        }
+                        if(tutorial.isMouseInside(e.mouseButton.x, e.mouseButton.y))
+                        {
+                            tutorial.setStatus(0);
+                            TutorialScreen::Run();
                         }
                         break;
                     case sf::Event::MouseMoved:
