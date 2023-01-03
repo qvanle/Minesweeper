@@ -7,4 +7,18 @@ Requirements:
 	makefile
 
 Features:
-	
+	drawing the board (done)
+	changing the state of each cell when it is selected (done)
+	timer (done)
+	Functions: new game, change board dimensions, select a function from screen (done)
+	randomize positions of the mines (done)
+	Receiving new position of the pointer (to select a cell) from screen (done)
+	saving the current state of board and loading in the next playing session (done)
+	saving high scores (done)
+
+other features:
+	Using mouse to select a cell
+	graphics (ocean themes)
+	using class, namespace
+	The first cell which is opened always is an empty cell
+	tutorial screen
