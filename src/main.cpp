@@ -1,5 +1,5 @@
-#include <Data.hpp>
-#include <Graphics.hpp>
+#include "Data.hpp"
+#include "Graphics.hpp"
 
 int main()
 {

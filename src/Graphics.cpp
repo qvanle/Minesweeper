@@ -1,6 +1,6 @@
-#include <Button.hpp>
-#include <InputBox.hpp>
-#include <Data.hpp>
+#include "Button.hpp"
+#include "InputBox.hpp"
+#include "Data.hpp"
 
 //declare variable
 
@@ -12,7 +12,7 @@ sf::RenderWindow GraphicsData::screen(sf::VideoMode(GraphicsData::WIDTH, Graphic
 
 void GraphicsData::INIT()
 {
-    GraphicsData::font.loadFromFile("data/font/monofur/monof55.ttf");
+    GraphicsData::font.loadFromFile("monof55.ttf");
 }
 
 
@@ -37,11 +37,11 @@ namespace TutorialScreen
 
     void INIT()
     {
-        textureBackground.loadFromFile("data/background/ocean/sunset.jpg");   
+        textureBackground.loadFromFile("sunset.jpg");   
         spriteBackground.setTexture(textureBackground);
 
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 100);
         logo.setScale(0.6f, 0.6f);
@@ -53,8 +53,8 @@ namespace TutorialScreen
         board.setPosition(50, 50);
         board.setFillColor(sf::Color(64, 64, 200));
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
         goback.setPosition(GraphicsData::WIDTH - goback.getW() - 160, 280);
 
         content.setString("\t\t  WELLCOME TO MY FIRST GAME\n\n"
@@ -145,11 +145,11 @@ namespace HighScoresScreen
 
         scores.clear();
 
-        textureBackground.loadFromFile("data/background/ocean/sunset.jpg");   
+        textureBackground.loadFromFile("sunset.jpg");   
         spriteBackground.setTexture(textureBackground);
 
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 100);
         logo.setScale(0.6f, 0.6f);
@@ -161,8 +161,8 @@ namespace HighScoresScreen
         board.setPosition(50, 50);
         board.setFillColor(sf::Color(64, 64, 200));
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
         goback.setPosition(GraphicsData::WIDTH - goback.getW() - 160, 280);
 
         title.setString("HIGH SCORE");
@@ -174,7 +174,7 @@ namespace HighScoresScreen
         px = 0;
         status = 0;
 
-        std::ifstream getData("data/.highscores");
+        std::ifstream getData(".highscores");
         std::array<float, 4> temp;
         while(getData >> temp[0] >> temp[1] >> temp[2] >> temp[3])
         {   
@@ -303,11 +303,11 @@ namespace DeadScreen
     
     void INIT()
     {
-        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        textureBackground.loadFromFile("darkocean.jpg");   
         spriteBackground.setTexture(textureBackground);
 
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
         logo.setTexture(logoTexture);
@@ -316,17 +316,17 @@ namespace DeadScreen
 
 
 
-        titleTexture.loadFromFile("data/title/lose.png");
+        titleTexture.loadFromFile("lose.png");
         titleSize = titleTexture.getSize();
         titlePosition = sf::Vector2f((GraphicsData::WIDTH - titleSize.x) / 2.0, (GraphicsData::HEIGHT - titleSize.y) / 2.0 - 200);
         title.setTexture(titleTexture);
         title.setPosition(titlePosition);
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
 
-        highScore.addImage("data/button/high_score.png");
-        highScore.addImage("data/button/choosing_high_score.png");
+        highScore.addImage("high_score.png");
+        highScore.addImage("choosing_high_score.png");
     }
     
     void mouseChangeStatus(int x, int y)
@@ -403,11 +403,11 @@ namespace WinningScreen
     
     void INIT()
     {
-        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        textureBackground.loadFromFile("darkocean.jpg");   
         spriteBackground.setTexture(textureBackground);
 
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x * 0.6) - 50, 50);
         logo.setTexture(logoTexture);
@@ -415,17 +415,17 @@ namespace WinningScreen
         logo.setPosition(logoPosition);
 
 
-        titleTexture.loadFromFile("data/title/you_win.png");
+        titleTexture.loadFromFile("you_win.png");
         titleSize = titleTexture.getSize();
         titlePosition = sf::Vector2f((GraphicsData::WIDTH - titleSize.x) / 2.0, (GraphicsData::HEIGHT - titleSize.y) / 2.0 - 200);
         title.setTexture(titleTexture);
         title.setPosition(titlePosition);
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
 
-        highScore.addImage("data/button/high_score.png");
-        highScore.addImage("data/button/choosing_high_score.png");
+        highScore.addImage("high_score.png");
+        highScore.addImage("choosing_high_score.png");
     }
     
     void mouseChangeStatus(int x, int y)
@@ -437,7 +437,7 @@ namespace WinningScreen
     void Run(float result, int n, int m, int k)
     {
         std::ofstream honors;
-        honors.open("data/.highscores", std::ios_base::app);
+        honors.open(".highscores", std::ios_base::app);
         honors << n << " " << m << " " << k << " " << result << "\n";
         honors.close();
         INIT();
@@ -514,7 +514,7 @@ namespace GameScreen
 
     void saving()
     {
-        std::ofstream saving ("data/saving.txt");
+        std::ofstream saving ("saving.txt");
         saving << BoardData::Columns << " " << BoardData::Rows << " " << BoardData::Mines << "\n";
         saving << cellsLeft << " " << mineLeft << " " << flags << "\n";
         saving << BoardData::time.asSeconds() << "\n"; 
@@ -532,10 +532,10 @@ namespace GameScreen
         horLine2.setFillColor(ChoosedColor);
         verLine2.setFillColor(ChoosedColor);
 
-        textureBackground.loadFromFile("data/background/ocean/darkocean.jpg");   
+        textureBackground.loadFromFile("darkocean.jpg");   
         spriteBackground.setTexture(textureBackground);
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((int)(GraphicsData::WIDTH - logoSize.x * 0.5) - 50, 50);
 
@@ -568,14 +568,14 @@ namespace GameScreen
         textFlag.setPosition(850, 345);
 
         
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
         goback.setPosition(GraphicsData::WIDTH - goback.getW() - 150, 550);
 
-        leftBar.addImage("data/button/left_bar.png");
-        rightBar.addImage("data/button/right_bar.png");
-        downBar.addImage("data/button/down_bar.png");
-        upBar.addImage("data/button/up_bar.png");
+        leftBar.addImage("left_bar.png");
+        rightBar.addImage("right_bar.png");
+        downBar.addImage("down_bar.png");
+        upBar.addImage("up_bar.png");
     }
 
     void INIT(int n, int m, int k)
@@ -600,10 +600,10 @@ namespace GameScreen
             for (int j = 0; j < m; j++)
             {
                 int id = i * m + j;
-                Tab[id].addImage("data/icons/ocean/12.png");
-                Tab[id].addImage("data/icons/ocean/" + std::to_string(BoardData::Board[id]) + ".jpg");
-                Tab[id].addImage("data/icons/ocean/9.jpg");
-                Tab[id].addImage("data/icons/ocean/10.jpg");
+                Tab[id].addImage("12.png");
+                Tab[id].addImage(std::to_string(BoardData::Board[id]) + ".jpg");
+                Tab[id].addImage("9.jpg");
+                Tab[id].addImage("10.jpg");
             }
         }
         INIT_GRAPHICS();
@@ -633,10 +633,10 @@ namespace GameScreen
             for (int j = 0; j < BoardData::Columns; j++)
             {
                 int id = i * BoardData::Columns + j;
-                Tab[id].addImage("data/icons/ocean/12.png");
-                Tab[id].addImage("data/icons/ocean/" + std::to_string(BoardData::Board[id]) + ".jpg");
-                Tab[id].addImage("data/icons/ocean/9.jpg");
-                Tab[id].addImage("data/icons/ocean/10.jpg");
+                Tab[id].addImage("12.png");
+                Tab[id].addImage(std::to_string(BoardData::Board[id]) + ".jpg");
+                Tab[id].addImage("9.jpg");
+                Tab[id].addImage("10.jpg");
                 int temp;
                 Data >> BoardData::Board[id] >> temp;
                 Tab[id].setStatus(temp);
@@ -669,10 +669,10 @@ namespace GameScreen
             for (int j = 0; j < m; j++)
             {
                 int id = i * m + j;
-                Tab[id].addImage("data/icons/ocean/12.png");
-                Tab[id].addImage("data/icons/ocean/" + std::to_string(BoardData::Board[id]) + ".jpg");
-                Tab[id].addImage("data/icons/ocean/9.jpg");
-                Tab[id].addImage("data/icons/ocean/10.jpg");
+                Tab[id].addImage("12.png");
+                Tab[id].addImage(std::to_string(BoardData::Board[id]) + ".jpg");
+                Tab[id].addImage("9.jpg");
+                Tab[id].addImage("10.jpg");
             }
         }
     }
@@ -694,7 +694,7 @@ namespace GameScreen
                 
                 if(i != 10 && j != 10)
                 {
-                    if(isDead && BoardData::Board[id] == BoardData::MineCell)
+                    if(isDead && BoardData::Board[id] == 11)
                         Tab[id].setStatus(1);
                     GraphicsData::screen.draw(Tab[id].getSprite(j * (1 + ICON_WIDTH * SCALE) + SHILF_RIGHT, 
                                                                 i * (1 + ICON_HEIGHT * SCALE) + SHILF_DOWN, SCALE));
@@ -761,8 +761,8 @@ namespace GameScreen
 
         cellsLeft--;
 
-        if(BoardData::Board[id] == BoardData::MineCell) isDead = true;
-        if(BoardData::Board[id] != BoardData::SafeCells[0]) return ; 
+        if(BoardData::Board[id] == 11) isDead = true;
+        if(BoardData::Board[id] != 0) return ; 
 
         openCells(x - 1, y);
         openCells(x + 1, y);
@@ -807,14 +807,14 @@ namespace GameScreen
         {
             flags--;
             cellsLeft++;
-            if(BoardData::Board[id] == BoardData::MineCell) mineLeft++;
+            if(BoardData::Board[id] == 11) mineLeft++;
             Tab[id].setStatus(3);
         }
         else if(Tab[id].getStatus() == 0) 
         {
             flags++;
             cellsLeft--;
-            if(BoardData::Board[id] == BoardData::MineCell) mineLeft--;
+            if(BoardData::Board[id] == 11) mineLeft--;
             Tab[id].setStatus(2);
         }
     }
@@ -906,7 +906,7 @@ namespace GameScreen
             isPlaying = true;
             if(isDead)
             {
-                if(oldData) remove("data/saving.txt");
+                if(oldData) remove("saving.txt");
                 isPlaying = false;
                 draw();
                 GraphicsData::screen.display();
@@ -917,7 +917,7 @@ namespace GameScreen
             
             if(cellsLeft == 0 && mineLeft == 0)
             {
-                if(oldData) remove("data/saving.txt");
+                if(oldData) remove("saving.txt");
                 isPlaying = false;
                 draw();
                 GraphicsData::screen.display();
@@ -999,10 +999,10 @@ namespace NewGameModeScreen
 
     void INIT()
     {
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
+        textureBackground.loadFromFile("startingscreen.jpg");   
         spriteBackground.setTexture(textureBackground);
         spriteBackground.setScale(0.342f, 0.2824f);
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
                 
         
         logoSize = logoTexture.getSize();
@@ -1017,24 +1017,24 @@ namespace NewGameModeScreen
         scroll.setFillColor(sf::Color::White);
         scroll.setPosition(350, 260);
 
-        up.addImage("data/button/up_arrow.png");
+        up.addImage("up_arrow.png");
 
-        down.addImage("data/button/down_arrow.png");
+        down.addImage("down_arrow.png");
 
-        easy.addImage("data/button/easy.png");
-        easy.addImage("data/button/choosing_easy.png");
+        easy.addImage("easy.png");
+        easy.addImage("choosing_easy.png");
         
-        medium.addImage("data/button/medium.png");
-        medium.addImage("data/button/choosing_medium.png");
+        medium.addImage("medium.png");
+        medium.addImage("choosing_medium.png");
 
-        hard.addImage("data/button/hard.png");
-        hard.addImage("data/button/choosing_hard.png");
+        hard.addImage("hard.png");
+        hard.addImage("choosing_hard.png");
 
-        custom.addImage("data/button/custom.png");
-        custom.addImage("data/button/choosing_custom.png");
+        custom.addImage("custom.png");
+        custom.addImage("choosing_custom.png");
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
 
     }
 
@@ -1118,8 +1118,8 @@ namespace NewGameModeScreen
         mines.setPosition(260, 500);
         mines.setTitle("Enter number of mines:");
         
-        play.addImage("data/button/play.png");
-        play.addImage("data/button/choosing_play.png");
+        play.addImage("play.png");
+        play.addImage("choosing_play.png");
         
         while(true)
         {
@@ -1286,11 +1286,11 @@ namespace ChooseGameDataSreen
     
     void INIT()
     {
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
+        textureBackground.loadFromFile("startingscreen.jpg");   
         spriteBackground.setTexture(textureBackground);
         spriteBackground.setScale(0.342f, 0.2824f);
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
 
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x) / 2.0, 110);
@@ -1298,14 +1298,14 @@ namespace ChooseGameDataSreen
         logo.setTexture(logoTexture);
         logo.setPosition(logoPosition);
 
-        newGame.addImage("data/button/newgame.png");
-        newGame.addImage("data/button/choosing_newgame.png");
+        newGame.addImage("newgame.png");
+        newGame.addImage("choosing_newgame.png");
 
-        _continue.addImage("data/button/continue.png");
-        _continue.addImage("data/button/choosing_continue.png");
+        _continue.addImage("continue.png");
+        _continue.addImage("choosing_continue.png");
 
-        goback.addImage("data/button/goback.png");
-        goback.addImage("data/button/choosing_goback.png");
+        goback.addImage("goback.png");
+        goback.addImage("choosing_goback.png");
 
         noData.setFont(GraphicsData::font);
         noData.setCharacterSize(32);
@@ -1383,12 +1383,12 @@ namespace ChooseGameDataSreen
                         }
                         if(_continue.isMouseInside(e.mouseButton.x, e.mouseButton.y))
                         {   
-                            if(isFileExist("data/saving.txt"))
+                            if(isFileExist("saving.txt"))
                             {
                                 _continue.setStatus(0);
                                 bool temp;
-                                GameScreen::INIT("data/saving.txt", temp);
-                                GameScreen::Run(-1, -1, -1, "data/saving.txt");
+                                GameScreen::INIT("saving.txt", temp);
+                                GameScreen::Run(-1, -1, -1, "saving.txt");
                             }else
                             {
                                 
@@ -1419,26 +1419,26 @@ namespace StartingScreen
     void INIT()
     {
     
-        textureBackground.loadFromFile("data/background/ocean/startingscreen.jpg");   
+        textureBackground.loadFromFile("startingscreen.jpg");   
         spriteBackground.setTexture(textureBackground);
         spriteBackground.setScale(0.342f, 0.2824f);
         
 
-        logoTexture.loadFromFile("data/title/header.png");
+        logoTexture.loadFromFile("header.png");
         logoSize = logoTexture.getSize();
         logoPosition = sf::Vector2f((GraphicsData::WIDTH - logoSize.x) / 2.0, 110);
         logo.setTexture(logoTexture);
         logo.setPosition(logoPosition);
 
 
-        play.addImage("data/button/play.png");
-        play.addImage("data/button/choosing_play.png");
+        play.addImage("play.png");
+        play.addImage("choosing_play.png");
 
-        tutorial.addImage("data/button/tutorial.png");
-        tutorial.addImage("data/button/choosing_tutorial.png");
+        tutorial.addImage("tutorial.png");
+        tutorial.addImage("choosing_tutorial.png");
 
-        highScore.addImage("data/button/high_score.png");
-        highScore.addImage("data/button/choosing_high_score.png");
+        highScore.addImage("high_score.png");
+        highScore.addImage("choosing_high_score.png");
     }
 
     void Draw()
@@ -1457,7 +1457,7 @@ namespace StartingScreen
         // draw "tutorial" button
         GraphicsData::screen.draw(tutorial.getSprite(GraphicsData::WIDTH / 2 - tutorial.getW() / 2 + shilfButVer,
                                                 GraphicsData::HEIGHT / 2 - tutorial.getH() / 2 + shilfButHor));
-        
+      
         // draw "high score" button
         GraphicsData::screen.draw(highScore.getSprite(GraphicsData::WIDTH / 2 - highScore.getW() / 2 + shilfButVer,
                                                 GraphicsData::HEIGHT / 2 + highScore.getH() + shilfButHor));

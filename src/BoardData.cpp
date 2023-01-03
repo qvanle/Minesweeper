@@ -1,13 +1,6 @@
-#include <Data.hpp>
+#include "Data.hpp"
 
 std::mt19937 rng(std::chrono::steady_clock().now().time_since_epoch().count());
-
-//  declare constant
-const CellType BoardData::SafeCells[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-const CellType BoardData::FlagCell = 9;
-const CellType BoardData::QuestionCell = 10;
-const CellType BoardData::MineCell = 11;
-
 
 //  variable
 std::vector<CellType> BoardData::Board;
@@ -44,7 +37,7 @@ int CountMines(Cell Point)
             int ny = y + dy;
             if(nx < 0 || nx >= BoardData::Columns) continue;
             if(ny < 0 || ny >= BoardData::Rows) continue;
-            if(BoardData::Board[GetBoardPos(Cell{nx, ny})] == BoardData::MineCell)
+            if(BoardData::Board[GetBoardPos(Cell{nx, ny})] == 11)
                 res = res + 1;
         }
     }
@@ -62,7 +55,7 @@ void BuildBoard(int n, int m, int k, int x = -1, int y = -1)
 
     for(int i = 0; i < BoardData::Mines; i++)
     {
-        BoardData::Board[i] = BoardData::MineCell; 
+        BoardData::Board[i] = 11; 
     }
     int loop = 20;
     do
@@ -75,7 +68,7 @@ void BuildBoard(int n, int m, int k, int x = -1, int y = -1)
         for (int j = 0; j < BoardData::Columns; j++)
         {
             int id = GetBoardPos(Cell{i, j});
-            if(BoardData::Board[id] == BoardData::MineCell) 
+            if(BoardData::Board[id] == 11) 
             {
                 BoardData::deadCells.push_back(id);
                 continue;
